@@ -24,7 +24,7 @@ E.g.  `𝚷(i for i in ℤ[1,3])` is a valid python code for $\sum_{i=1}^{3}i$
 You can install gsd via `pip`:
 
 ```bash
-$ pip install gsd
+$ pip install ref_gsd
 ```
 
 

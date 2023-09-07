@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "gsd"
+name = "ref_gsd"
 version = "0.0.1"
 description = "Reference implementation of generalised score distribution in python"
 authors = ["Krzysztof Rusek <krusek@agh.edu.pl>"]
@@ -20,6 +20,8 @@ classifiers = [
     "Topic :: Scientific/Engineering :: Information Analysis",
     "Topic :: Scientific/Engineering :: Mathematics",
 ]
+
+packages=[{include="gsd", from="src"}]
 
 [tool.poetry.dependencies]
 python = "^3.9"
