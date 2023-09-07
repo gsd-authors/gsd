@@ -14,7 +14,7 @@ If you decide to apply the concepts presented or base on the provided code, plea
 ### Fancy math
 
 In order to keep the reference implementation as close to the math as possible we define some utilities with unicode symbols.
-E.g.  `𝚷(i for i in ℤ[1,3])` is a valid python code for $\sum_{i=1}^{3}i$
+E.g.  `𝚷(i for i in ℤ[1,3])` is a valid python code for $$\sum_{i=1}^{3} i$$
 
 
 
