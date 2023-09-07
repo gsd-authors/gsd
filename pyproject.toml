@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "ref_gsd"
-version = "0.0.1"
+version = "0.0.2"
 description = "Reference implementation of generalised score distribution in python"
 authors = ["Krzysztof Rusek <krusek@agh.edu.pl>"]
 license = "Apache License 2.0"
