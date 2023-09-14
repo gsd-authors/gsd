@@ -32,19 +32,13 @@ $ pip install ref_gsd
 ## Development
 
 To develop and modify gsd, you need to install
-[`poetry`](https://python-poetry.org/), a tool for Python packaging and
+[`hatch`]([https://python-poetry.org/](https://hatch.pypa.io)), a tool for Python packaging and
 dependency management.
 
-To install the development dependencies of gsd, you can run
+To  enter a virtual environment for testing or debugging, you can run:
 
 ```bash
-$ poetry install
-```
-
-and to enter a virtual environment for testing or debugging, you can run:
-
-```bash
-$ poetry shell
+$ hatch shell
 ```
 
 ### Running tests
@@ -52,5 +46,5 @@ $ poetry shell
 Gsd uses [Pytest](https://pytest.org/) for testing. To run the tests, use the following command:
 
 ```
-$ poetry run pytest tests
+$ hatch run test 
 ```
