@@ -1,9 +1,13 @@
-[tool.poetry]
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
 name = "ref_gsd"
-version = "0.0.2"
+dynamic = ["version"]
 description = "Reference implementation of generalised score distribution in python"
-authors = ["Krzysztof Rusek <krusek@agh.edu.pl>"]
-license = "Apache License 2.0"
+authors = [{ name = "Krzysztof Rusek", email = "krussek@gmail.com" }]
+license = {file = "LICENSE"}
 readme = "README.md"
 
 keywords = ["jax", "distribution", "QoE", "test"]
@@ -20,17 +24,26 @@ classifiers = [
     "Topic :: Scientific/Engineering :: Information Analysis",
     "Topic :: Scientific/Engineering :: Mathematics",
 ]
+requires-python = ">=3.9"
+dependencies=["jax>=0.4.6"]
 
-packages=[{include="gsd", from="src"}]
+[project.urls]
+Homepage = "https://github.com/krzysztofrusek/queuinx"
 
-[tool.poetry.dependencies]
-python = "^3.9"
-jax = "^0.4.6"
+[tool.hatch.version]
+path = "src/gsd/__init__.py"
 
-[tool.poetry.group.dev.dependencies]
-pytest = "^7.1.3"
-jaxlib = "^0.4.6"
+[tool.hatch.build]
+sources = ["src"]
 
-[build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+[tool.hatch.build.targets]
+include = [
+    "/src/*",
+]
+
+[tool.hatch.envs.default]
+dependencies=["pytest","jaxlib>=0.4.6"]
+
+[tool.hatch.envs.default.scripts]
+test = "pytest {args:tests}"
+
