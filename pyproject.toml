@@ -28,17 +28,18 @@ requires-python = ">=3.9"
 dependencies=["jax>=0.4.6"]
 
 [project.urls]
-Homepage = "https://github.com/krzysztofrusek/queuinx"
+Homepage = "https://github.com/gsd-authors/gsd"
 
 [tool.hatch.version]
 path = "src/gsd/__init__.py"
 
-[tool.hatch.build]
-sources = ["src"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/gsd"]
 
 [tool.hatch.build.targets]
 include = [
-    "/src/*",
+    "/src/",
 ]
 
 [tool.hatch.envs.default]
