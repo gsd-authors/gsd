@@ -43,7 +43,7 @@ $ hatch shell
 
 ### Running tests
 
-Gsd uses [Pytest](https://pytest.org/) for testing. To run the tests, use the following command:
+Gsd uses unitest for testing. To run the tests, use the following command:
 
 ```
 $ hatch run test 
