@@ -1,20 +1,15 @@
-import gsd
-import jax
+import argparse
 import jax.numpy as jnp
-
+from gsd import fit_mle
 
 if __name__ == '__main__':
-    gsd.log_prob(1., 0.5, 2)
-    m=gsd.mean(3.,0.7)
-    v = gsd.variance(3.,0.7)
-    k = jax.random.key(43)
-    s = gsd.sample(3.,0.7,(24,),k)
+    parser = argparse.ArgumentParser(description='GSD estimator')
 
-    jnp.mean(s), jnp.var(s)
+    parser.add_argument("response", nargs=5, type=int,
+                        metavar=("num1", "num2", "num3", "num4", "num5"),
+                        help="List of 5 counts")
 
-    #jax.vmap(gsd.log_prob, in_axes=(None,None,0))(3.,0.7,s)
+    args = parser.parse_args()
 
-
-
-
-    print('test')
+    hat,_ = fit_mle(data=jnp.asarray(args.response, dtype=jnp.float32))
+    print(hat)
