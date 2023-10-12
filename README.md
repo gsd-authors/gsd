@@ -48,3 +48,13 @@ Gsd uses unitest for testing. To run the tests, use the following command:
 ```
 $ hatch run test 
 ```
+
+### Standalone estimator
+
+You can quickly estimate GSD parameters from a command line interface
+
+```shell
+python3 -m gsd 0 12 13 4 0
+```
+
+    GSDParams(psi=Array(2.6272388, dtype=float32), rho=Array(0.9041536, dtype=float32))

@@ -6,7 +6,7 @@ import jax.tree_util as jtu
 from jax import Array
 from jax.typing import ArrayLike
 
-from gsd.gsd import vmax, vmin, log_prob
+from .gsd import vmax, vmin, log_prob
 
 
 class GSDParams(NamedTuple):
@@ -108,3 +108,4 @@ def fit_mle(data: ArrayLike, max_iterations: int = 100, log_lr_min: ArrayLike = 
                                    OptState(params=theta0, previous_params=jtu.tree_map(lambda _: jnp.inf, theta0),
                                             count=0))
     return opt_state.params, opt_state
+
