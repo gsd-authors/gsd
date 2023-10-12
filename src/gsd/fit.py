@@ -51,7 +51,7 @@ class OptState(NamedTuple):
 
 @jax.jit
 def fit_mle(data: ArrayLike, max_iterations: int = 100, log_lr_min: ArrayLike = -15, log_lr_max: ArrayLike = 2.,
-            num_lr: ArrayLike = 10) -> tuple[GSDParams,OptState]:
+            num_lr: ArrayLike = 10) -> tuple[GSDParams, OptState]:
     """Finds the maximum likelihood estimator of the GSD parameters.
     The algorithm used here is a simple gradient ascent.
     We use the concept of projected gradient to enforce constraints for parameters (psi in [1, 5], rho in [0, 1]) and exhaustive search for line search along the gradient.
