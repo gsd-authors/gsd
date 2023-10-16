@@ -13,6 +13,14 @@ class FitTestCase(unittest.TestCase):
         self.assertAlmostEqual(os.params.rho, 1)
 
 
+    def test_list(self):
+        #     1  2  3 4 5
+        data=[0,10,10,0,0.]
+        _,os = gsd.fit.fit_mle(data)
+        self.assertAlmostEqual(os.params.psi, 2.5)
+        self.assertAlmostEqual(os.params.rho, 1)
+
+
 
 if __name__ == '__main__':
     unittest.main()

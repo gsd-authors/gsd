@@ -27,6 +27,8 @@ def fit_moments(data: ArrayLike) -> GSDParams:
     :param data: A 5d Array of counts of each response.
     :return: GSD Parameters
     """
+
+    data= jnp.asarray(data)
     psi = jnp.dot(data, jnp.arange(1, 6)) / jnp.sum(data)
     V = jnp.dot(data, jnp.arange(1, 6) ** 2) / jnp.sum(data) - psi ** 2
     return GSDParams(psi=psi, rho=(vmax(psi) - V) / (vmax(psi) - vmin(psi)))
@@ -65,6 +67,7 @@ def fit_mle(data: ArrayLike, max_iterations: int = 100, log_lr_min: ArrayLike = 
     :return: An opt state whore params filed contains estimated values of GSD Parameters
     """
 
+    data = jnp.asarray(data)
     def ll(theta: GSDParams) -> Array:
         logits = jax.vmap(log_prob, (None, None, 0), (0))(theta.psi, theta.rho, jnp.arange(1, 6))
         return jnp.dot(data, logits) / jnp.sum(data)
