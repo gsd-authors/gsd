@@ -1,3 +1,4 @@
+import numpy as np
 from jax import config
 config.update("jax_enable_x64", True)
 
@@ -51,6 +52,27 @@ class FancyMathTestCase(unittest.TestCase):
 
         x = 𝚷(i for i in ℤ[1,3])
         self.assertEqual(x,6)
+
+class SufficientStatistic(unittest.TestCase):
+
+    def test_sufficient_statistic(self):
+        data=[1,2,2,3,4,1,1]
+        ss = gsd.sufficient_statistic(data)
+        #                                          1, 2  3  4  5
+        self.assertTrue(np.allclose(ss,np.asarray([3, 2, 1, 1, 0])))
+
+    def test_sufficient_statistic2(self):
+        data=[1,2,3,4,5]
+        ss = gsd.sufficient_statistic(data)
+        #                                          1, 2  3  4  5
+        self.assertTrue(np.allclose(ss,np.asarray([1, 1, 1, 1, 1])))
+
+    def test_sufficient_statistic3(self):
+        data=[1,]
+        ss = gsd.sufficient_statistic(data)
+        #                                          1, 2  3  4  5
+        self.assertTrue(np.allclose(ss,np.asarray([1, 0, 0, 0, 0])))
+
 
 if __name__ == '__main__':
     unittest.main()
