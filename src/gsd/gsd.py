@@ -100,3 +100,15 @@ def sample(psi: ArrayLike, rho: ArrayLike, shape: Shape, key: PRNGKeyArray) -> A
     index = jnp.arange(1, N + 1)
     logits = jax.vmap(log_prob, in_axes=(None, None, 0))(psi, rho, index)
     return jax.random.categorical(key, logits, shape=shape) + 1
+
+
+@jax.jit
+def sufficient_statistic(data: ArrayLike) -> Array:
+    """ Compute GSD sufficient statistic from samples.
+
+    :param data: Samples from GSD data[i] in [1..5]
+    :return: Counts of each possible values
+    """
+    data = jnp.asarray(data)
+    _, cu = jnp.unique(data, return_counts=True, size=N)
+    return cu
