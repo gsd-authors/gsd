@@ -54,7 +54,7 @@ $ hatch run test
 You can quickly estimate GSD parameters from a command line interface
 
 ```shell
-python3 -m gsd 0 12 13 4 0
+python3 -m gsd -c 1 2 3 4 5
 ```
 
-    GSDParams(psi=Array(2.6272388, dtype=float32), rho=Array(0.9041536, dtype=float32))
+    psi=3.6667 rho=0.6000
