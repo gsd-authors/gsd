@@ -26,7 +26,7 @@ def vmin(ψ: float) -> float:
 
 
 def vmax(ψ: float) -> float:
-    return (ψ - 1.) * (5 - ψ)
+    return (ψ - 1.) * (M - ψ)
 
 
 def C(ψ):
