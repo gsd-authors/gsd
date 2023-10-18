@@ -24,7 +24,7 @@ class GSDParams(NamedTuple):
 def fit_moments(data: ArrayLike) -> GSDParams:
     """Fits GSD using moments estimator
 
-    :param data: A 5d Array of counts of each response.
+    :param data: An Array of counts of each response.
     :return: GSD Parameters
     """
 
@@ -58,7 +58,7 @@ def fit_mle(data: ArrayLike, max_iterations: int = 100, log_lr_min: ArrayLike = 
     The algorithm used here is a simple gradient ascent.
     We use the concept of projected gradient to enforce constraints for parameters (psi in [1, 5], rho in [0, 1]) and exhaustive search for line search along the gradient.
 
-    :param data: 5D array of counts for each response.
+    :param data: An array of counts for each response.
     :param max_iterations: Maximum number of iterations.
     :param log_lr_min: Log2 of the smallest learning rate.
     :param log_lr_max: Log2 of the largest learning rate.
