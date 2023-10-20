@@ -46,3 +46,4 @@ nav:
     - 'index.md'
     - 'api.md'
     - Colab: 'examples/colab.ipynb'
+    - Bayes: 'examples/bayes.ipynb'
