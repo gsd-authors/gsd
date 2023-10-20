@@ -29,8 +29,6 @@ $ pip install ref_gsd
 ```
 
 
-**[DOC](https://gsd-authors.github.io/gsd)**
-
 ## Development
 
 To develop and modify gsd, you need to install
