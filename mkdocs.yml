@@ -1,0 +1,48 @@
+site_name: GSD
+site_description: The documentation for the reference implementation of generalised score distribution in python.
+
+theme:
+    name: "material"
+    features:
+      - navigation.sections
+      - toc.integrate
+      - header.autohide
+
+markdown_extensions:
+    - pymdownx.arithmatex:  # Render LaTeX via katex
+        generic: true
+    - pymdownx.superfences  # Seems to enable syntax highlighting when used with the Material theme.
+    - pymdownx.details  # Allowing hidden expandable regions denoted by ???
+    - pymdownx.snippets:  # Include one Markdown file into another
+        base_path: docs
+    - admonition
+    - toc:
+        permalink: "¤"  # Adds a clickable permalink to each section heading
+        toc_depth: 4
+
+extra_javascript:
+  - javascripts/katex.js
+  - https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.7/katex.min.js
+  - https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.7/contrib/auto-render.min.js
+
+extra_css:
+  - https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.7/katex.min.css
+
+
+
+plugins:
+    - search
+    - mknotebooks  # Jupyter notebooks
+    - mkdocstrings:
+        handlers:
+          python:
+            options:
+              show_source: false
+              show_root_heading: true
+              docstring_style: sphinx
+
+
+nav:
+    - 'index.md'
+    - 'api.md'
+    - Colab: 'examples/colab.ipynb'

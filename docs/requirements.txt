@@ -1,0 +1,9 @@
+mkdocs
+mkdocs-material
+pymdown-extensions
+mkdocstrings
+mknotebooks
+# pytkdocs_tweak
+mkdocs_include_exclude_files
+jinja2
+pygments

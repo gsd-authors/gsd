@@ -81,6 +81,13 @@ def _prob_ρ_0(ψ, k):
 
 
 def gsd_prob(ψ: float, ρ: float, k: int) -> float:
+    """Reference implementation of GSD probabilities in pure python.
+
+    :param ψ: mean
+    :param ρ: dispersion
+    :param k: response
+    :return: probability of response k
+    """
     if ρ < C(ψ):
         if ρ == 0:
             return _prob_ρ_0(ψ, k)

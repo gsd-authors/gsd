@@ -48,6 +48,7 @@ def log_prob(psi: ArrayLike, rho: ArrayLike, k: ArrayLike) -> Array:
     :param k: response
     :return: log of the probability in GSD distribution
     """
+
     index = jnp.arange(0, 6)
     almost_neg_inf = np.log(1e-10)
 
