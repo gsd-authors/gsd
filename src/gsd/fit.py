@@ -10,7 +10,7 @@ from .gsd import vmax, vmin, log_prob
 
 
 class GSDParams(NamedTuple):
-    """NamedTuple representing parameters for the Generalized Structure Distribution (GSD).
+    """NamedTuple representing parameters for the Generalized Score Distribution (GSD).
 
     This class is used to store the psi and  rho parameters for the GSD.
     It provides a convenient way to group these parameters together for use in various
