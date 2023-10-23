@@ -1,7 +1,7 @@
 mkdocs
 mkdocs-material
 pymdown-extensions
-mkdocstrings
+mkdocstrings[crystal,python]
 mknotebooks
 # pytkdocs_tweak
 mkdocs_include_exclude_files
