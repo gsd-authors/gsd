@@ -7,3 +7,4 @@ mknotebooks
 mkdocs_include_exclude_files
 jinja2
 pygments
+-e .
