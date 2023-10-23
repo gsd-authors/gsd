@@ -370,25 +370,50 @@
 
 <h1 id="gsd">GSD<a class="headerlink" href="#gsd" title="Permanent link">¤</a></h1>
 <p>Reference implementation of generalised score distribution in python</p>
-<p>This library provides a reference implementation of gsd probabilities for correctness and efficient implementation of samples and log_probabilities in <code>jax</code>. </p>
+<p>This library provides a reference implementation of gsd probabilities for correctness and efficient implementation of samples and log_probabilities in <code>jax</code>.</p>
 <h3 id="citations">Citations<a class="headerlink" href="#citations" title="Permanent link">¤</a></h3>
-<p>Theoretical derivation of GSD is described in the following paper.</p>
-<p>Ćmiel, B., Nawała, J., Janowski, L. et al. Generalised score distribution: underdispersed continuation of the beta-binomial distribution. Stat Papers (2023). https://doi.org/10.1007/s00362-023-01398-0</p>
+<p>Theoretical derivation of GSD is described in the following papers.</p>
+<div class="highlight"><pre><span></span><code>@Article{Cmiel2023,
+author={{\&#39;{C}}miel, Bogdan
+and Nawa{\l}a, Jakub
+and Janowski, Lucjan
+and Rusek, Krzysztof},
+title={Generalised score distribution: underdispersed continuation of the beta-binomial distribution},
+journal={Statistical Papers},
+year={2023},
+month={Feb},
+day={09},
+issn={1613-9798},
+doi={10.1007/s00362-023-01398-0},
+url={https://doi.org/10.1007/s00362-023-01398-0}
+}
+</code></pre></div>
+<div class="highlight"><pre><span></span><code>@ARTICLE{gsdnawala,
+  author={Nawała, Jakub and Janowski, Lucjan and Ćmiel, Bogdan and Rusek, Krzysztof and Pérez, Pablo},
+  journal={IEEE Transactions on Multimedia}, 
+  title={Generalized Score Distribution: A Two-Parameter Discrete Distribution Accurately Describing Responses From Quality of Experience Subjective Experiments}, 
+  year={2022},
+  volume={},
+  number={},
+  pages={1-15},
+  doi={10.1109/TMM.2022.3205444}
+  }
+</code></pre></div>
 <p>If you decide to apply the concepts presented or base on the provided code, please do refer our related paper.</p>
 <h2 id="installation">Installation<a class="headerlink" href="#installation" title="Permanent link">¤</a></h2>
 <p>You can install gsd via <code>pip</code>:</p>
-<div class="highlight"><pre><span></span><code>$<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>ref_gsd
+<div class="highlight"><pre><span></span><code>pip<span class="w"> </span>install<span class="w"> </span>ref_gsd
 </code></pre></div>
 <h2 id="development">Development<a class="headerlink" href="#development" title="Permanent link">¤</a></h2>
 <p>To develop and modify gsd, you need to install
 <a href="[https://hatch.pypa.io](https://hatch.pypa.io)"><code>hatch</code></a>, a tool for Python packaging and
 dependency management.</p>
 <p>To  enter a virtual environment for testing or debugging, you can run:</p>
-<div class="highlight"><pre><span></span><code>$<span class="w"> </span>hatch<span class="w"> </span>shell
+<div class="highlight"><pre><span></span><code>hatch<span class="w"> </span>shell
 </code></pre></div>
 <h3 id="running-tests">Running tests<a class="headerlink" href="#running-tests" title="Permanent link">¤</a></h3>
 <p>Gsd uses unitest for testing. To run the tests, use the following command:</p>
-<div class="highlight"><pre><span></span><code>$ hatch run test 
+<div class="highlight"><pre><span></span><code>hatch run test 
 </code></pre></div>
 <h3 id="standalone-estimator">Standalone estimator<a class="headerlink" href="#standalone-estimator" title="Permanent link">¤</a></h3>
 <p>You can quickly estimate GSD parameters from a command line interface</p>

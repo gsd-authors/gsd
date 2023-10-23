@@ -76,6 +76,11 @@
     <label class="md-overlay" for="__drawer"></label>
     <div data-md-component="skip">
       
+        
+        <a href="#info" class="md-skip">
+          Skip to content
+        </a>
+      
     </div>
     <div data-md-component="announce">
       
@@ -243,6 +248,8 @@
       <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
       
       
+        
+      
       
       <a href="./" class="md-nav__link md-nav__link--active">
         
@@ -292,8 +299,6 @@
                   
 
 
-  <h1>Colab</h1>
-
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
 <script>
 (function() {
@@ -331,6 +336,14 @@
 </div>
 </div>
 </div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h1 id="info">Info<a class="headerlink" href="#info" title="Permanent link">¤</a></h1>
+<p>This is template notebook experiments with GSD in colab.</p>
+</div>
+</div>
+</div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 
@@ -343,6 +356,7 @@
 <div class="input">
 
 <div class="highlight"><pre><span></span><code>import gsd
+print(gsd.__version__)
 </code></pre></div>
 
 </div>
@@ -351,6 +365,14 @@
 <div class="input">
 
 <div class="highlight"><pre><span></span><code>gsd.gsd_prob(4.,0.8,2)
+</code></pre></div>
+
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="highlight"><pre><span></span><code>gsd.fit_mle([2,8,2,0,0.])
 </code></pre></div>
 
 </div>
