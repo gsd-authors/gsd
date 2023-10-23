@@ -19,7 +19,7 @@ jobs:
         with:
           python-version: 3.9
 
-      - name: Build the documentation with Sphinx
+      - name: Build the documentation with Mkdocs
         run: |
           pip install -r docs/requirements.txt
           mkdocs build
