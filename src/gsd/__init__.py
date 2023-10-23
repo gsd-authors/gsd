@@ -1,4 +1,4 @@
-__version__ = '0.0.5'
+__version__ = '0.1.0'
 
 from gsd.fit import GSDParams
 from gsd.fit import fit_mle

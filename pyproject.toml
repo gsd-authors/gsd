@@ -31,6 +31,7 @@ dependencies=["jax>=0.4.6"]
 
 [project.urls]
 Homepage = "https://github.com/gsd-authors/gsd"
+Documentation = "https://gsd-authors.github.io/gsd/"
 
 [tool.hatch.version]
 path = "src/gsd/__init__.py"

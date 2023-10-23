@@ -1,28 +1,53 @@
 # GSD
+
 Reference implementation of generalised score distribution in python
 
-This library provides a reference implementation of gsd probabilities for correctness and efficient implementation of samples and log_probabilities in `jax`. 
+This library provides a reference implementation of gsd probabilities for correctness and efficient implementation of samples and log_probabilities in `jax`.
 
 ### Citations
 
-Theoretical derivation of GSD is described in the following paper.
+Theoretical derivation of GSD is described in the following papers.
 
-Ćmiel, B., Nawała, J., Janowski, L. et al. Generalised score distribution: underdispersed continuation of the beta-binomial distribution. Stat Papers (2023). https://doi.org/10.1007/s00362-023-01398-0
+```
+@Article{Cmiel2023,
+author={{\'{C}}miel, Bogdan
+and Nawa{\l}a, Jakub
+and Janowski, Lucjan
+and Rusek, Krzysztof},
+title={Generalised score distribution: underdispersed continuation of the beta-binomial distribution},
+journal={Statistical Papers},
+year={2023},
+month={Feb},
+day={09},
+issn={1613-9798},
+doi={10.1007/s00362-023-01398-0},
+url={https://doi.org/10.1007/s00362-023-01398-0}
+}
+
+```
+
+```
+@ARTICLE{gsdnawala,
+  author={Nawała, Jakub and Janowski, Lucjan and Ćmiel, Bogdan and Rusek, Krzysztof and Pérez, Pablo},
+  journal={IEEE Transactions on Multimedia}, 
+  title={Generalized Score Distribution: A Two-Parameter Discrete Distribution Accurately Describing Responses From Quality of Experience Subjective Experiments}, 
+  year={2022},
+  volume={},
+  number={},
+  pages={1-15},
+  doi={10.1109/TMM.2022.3205444}
+  }
+```
 
 If you decide to apply the concepts presented or base on the provided code, please do refer our related paper.
-
-
-
 
 ## Installation
 
 You can install gsd via `pip`:
 
 ```bash
-$ pip install ref_gsd
+pip install ref_gsd
 ```
-
-
 
 ## Development
 
@@ -33,7 +58,7 @@ dependency management.
 To  enter a virtual environment for testing or debugging, you can run:
 
 ```bash
-$ hatch shell
+hatch shell
 ```
 
 ### Running tests
@@ -41,7 +66,7 @@ $ hatch shell
 Gsd uses unitest for testing. To run the tests, use the following command:
 
 ```
-$ hatch run test 
+hatch run test 
 ```
 
 ### Standalone estimator
@@ -53,5 +78,3 @@ python3 -m gsd -c 1 2 3 4 5
 ```
 
     psi=3.6667 rho=0.6000
-
-
