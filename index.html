@@ -404,6 +404,10 @@ url={https://doi.org/10.1007/s00362-023-01398-0}
 <p>You can install gsd via <code>pip</code>:</p>
 <div class="highlight"><pre><span></span><code>pip<span class="w"> </span>install<span class="w"> </span>ref_gsd
 </code></pre></div>
+<p><strong><em>Note that you install <code>ref_gsd</code> but import <code>gsd</code> e.g.</em></strong></p>
+<div class="highlight"><pre><span></span><code><span class="kn">import</span> <span class="nn">gsd</span>
+<span class="n">gsd</span><span class="o">.</span><span class="n">fit_mle</span><span class="p">([</span><span class="mi">2</span><span class="p">,</span><span class="mi">8</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mf">0.</span><span class="p">])</span>
+</code></pre></div>
 <h2 id="development">Development<a class="headerlink" href="#development" title="Permanent link">¤</a></h2>
 <p>To develop and modify gsd, you need to install
 <a href="[https://hatch.pypa.io](https://hatch.pypa.io)"><code>hatch</code></a>, a tool for Python packaging and
