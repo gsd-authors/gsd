@@ -1,3 +1,5 @@
+import functools as ft
+import itertools as it
 from typing import NamedTuple
 
 import jax
@@ -20,6 +22,19 @@ class GSDParams(NamedTuple):
     rho: Array
 
 
+@ft.cache
+def pairs(M: int = 5) -> Array:
+    comb = it.combinations(range(0, M), 2)
+    a = jnp.asarray(list(comb))
+    return a
+
+@jax.jit
+def pmax(probs: Array, M: int = 5) -> Array:
+    i = pairs(M)
+    sums = jnp.sum(probs[i], axis=1)
+    return jnp.max(sums)
+
+
 @jax.jit
 def fit_moments(data: ArrayLike) -> GSDParams:
     """Fits GSD using moments estimator
@@ -28,7 +43,7 @@ def fit_moments(data: ArrayLike) -> GSDParams:
     :return: GSD Parameters
     """
 
-    data= jnp.asarray(data)
+    data = jnp.asarray(data)
     psi = jnp.dot(data, jnp.arange(1, 6)) / jnp.sum(data)
     V = jnp.dot(data, jnp.arange(1, 6) ** 2) / jnp.sum(data) - psi ** 2
     return GSDParams(psi=psi, rho=(vmax(psi) - V) / (vmax(psi) - vmin(psi)))
@@ -68,6 +83,7 @@ def fit_mle(data: ArrayLike, max_iterations: int = 100, log_lr_min: ArrayLike = 
     """
 
     data = jnp.asarray(data)
+
     def ll(theta: GSDParams) -> Array:
         logits = jax.vmap(log_prob, (None, None, 0), (0))(theta.psi, theta.rho, jnp.arange(1, 6))
         return jnp.dot(data, logits) / jnp.sum(data)
@@ -111,4 +127,3 @@ def fit_mle(data: ArrayLike, max_iterations: int = 100, log_lr_min: ArrayLike = 
                                    OptState(params=theta0, previous_params=jtu.tree_map(lambda _: jnp.inf, theta0),
                                             count=0))
     return opt_state.params, opt_state
-
