@@ -1,3 +1,4 @@
+from functools import partial
 import itertools as it
 from typing import NamedTuple
 
@@ -78,9 +79,9 @@ class OptState(NamedTuple):
     count: int
 
 
-@jax.jit
+@partial(jax.jit, static_argnames=["constrain_by_pmax"])
 def fit_mle(data: ArrayLike, max_iterations: int = 100, log_lr_min: ArrayLike = -15, log_lr_max: ArrayLike = 2.,
-            num_lr: ArrayLike = 10) -> tuple[GSDParams, OptState]:
+            num_lr: ArrayLike = 10, constrain_by_pmax=False) -> tuple[GSDParams, OptState]:
     """Finds the maximum likelihood estimator of the GSD parameters.
     The algorithm used here is a simple gradient ascent.
     We use the concept of projected gradient to enforce constraints for parameters (psi in [1, 5], rho in [0, 1]) and exhaustive search for line search along the gradient.
@@ -90,19 +91,30 @@ def fit_mle(data: ArrayLike, max_iterations: int = 100, log_lr_min: ArrayLike = 
     :param log_lr_min: Log2 of the smallest learning rate.
     :param log_lr_max: Log2 of the largest learning rate.
     :param num_lr: Number of learning rates to check during the line search.
+    :param constrain_by_pmax: Bool flag whether for add constrain described in Appendix D
 
     :return: An opt state whore params filed contains estimated values of GSD Parameters
     """
 
     data = jnp.asarray(data)
 
+    def make_logits(theta: GSDParams) -> Array:
+        logits = jax.vmap(log_prob, (None, None, 0), (0))(
+            theta.psi, theta.rho, jnp.arange(1, 6))
+        return logits
+
     def ll(theta: GSDParams) -> Array:
-        logits = jax.vmap(log_prob, (None, None, 0), (0))(theta.psi, theta.rho, jnp.arange(1, 6))
+        logits = make_logits(theta)
         return jnp.dot(data, logits) / jnp.sum(data)
 
     grad_ll = jax.grad(ll)
-    theta0 = fit_moments(data)
-    rate = jnp.concatenate([jnp.zeros((1,)), jnp.logspace(log_lr_min, log_lr_max, num_lr, base=2.)])
+    if constrain_by_pmax:
+        theta0 = GSDParams(psi=3.,rho=0.5)
+    else:
+        theta0 = fit_moments(data)
+    
+    rate = jnp.concatenate([jnp.zeros((1,)), jnp.logspace(
+        log_lr_min, log_lr_max, num_lr, base=2.)])
 
     def update(tg, t, lo, hi):
         '''
@@ -125,14 +137,28 @@ def fit_mle(data: ArrayLike, max_iterations: int = 100, log_lr_min: ArrayLike = 
         g = grad_ll(t)
         new_theta = jtu.tree_map(update, g, t, lo, hi)
         new_lls = jax.vmap(ll)(new_theta)
-        max_idx = jnp.argmax(jnp.where(jnp.isnan(new_lls), -jnp.inf, new_lls))
+        # filter nan
+        new_lls = jnp.where(jnp.isnan(new_lls), -jnp.inf, new_lls)
+        # filter pmax
+        if constrain_by_pmax:
+            n = jnp.sum(data)
+            logits = jax.vmap(make_logits)(new_theta)
+            is_in_region = jax.vmap(
+                allowed_region, in_axes=(0, None))(logits, n)
+            #jax.debug.print("in region {is_in_region}",is_in_region=is_in_region)
+            new_lls = jnp.where(is_in_region, new_lls, -jnp.inf)
+
+        max_idx = jnp.argmax(new_lls)
+        #jax.debug.print("{max_idx}||| {new_lls}",max_idx=max_idx,new_lls=new_lls)
         return OptState(params=jtu.tree_map(lambda t: t[max_idx], new_theta), previous_params=t, count=count + 1)
 
     def cond_fun(state: OptState) -> bool:
         tn, tnm1, c = state
-        should_stop = jnp.logical_or(jnp.all(jnp.array(tn) == jnp.array(tnm1)), c > max_iterations)
+        should_stop = jnp.logical_or(
+            jnp.all(jnp.array(tn) == jnp.array(tnm1)), c > max_iterations)
         # stop on NaN
-        should_stop = jnp.logical_or(should_stop, jnp.any(jnp.isnan(jnp.array(tn))))
+        should_stop = jnp.logical_or(
+            should_stop, jnp.any(jnp.isnan(jnp.array(tn))))
         return jnp.logical_not(should_stop)
 
     opt_state = jax.lax.while_loop(cond_fun, body_fun,
