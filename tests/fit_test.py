@@ -3,7 +3,7 @@ import jax.numpy as jnp
 
 import gsd.fit
 
-from src.gsd.fit import pairs, pmax
+from src.gsd.fit import pairs, pmax, log_pmax
 
 
 class FitTestCase(unittest.TestCase):
@@ -28,6 +28,12 @@ class FitTestCase(unittest.TestCase):
         p = pmax(x)
         self.assertAlmostEqual(p, 5+4)
 
+    def test_log_pmax(self):
+        x=jnp.arange(1,6)
+        x = x/x.sum()
+        p = pmax(x)
+        lpm = log_pmax(jnp.log(x))
+        self.assertAlmostEqual(jnp.log(p), lpm, places=4)
 
 if __name__ == '__main__':
     unittest.main()

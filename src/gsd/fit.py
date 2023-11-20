@@ -1,4 +1,3 @@
-import functools as ft
 import itertools as it
 from typing import NamedTuple
 
@@ -22,17 +21,30 @@ class GSDParams(NamedTuple):
     rho: Array
 
 
-@ft.cache
 def pairs(M: int = 5) -> Array:
     comb = it.combinations(range(0, M), 2)
     a = jnp.asarray(list(comb))
     return a
+
 
 @jax.jit
 def pmax(probs: Array, M: int = 5) -> Array:
     i = pairs(M)
     sums = jnp.sum(probs[i], axis=1)
     return jnp.max(sums)
+
+
+# @jax.jit
+def log_pmax(log_probs: Array, M: int = 5) -> Array:
+    i = pairs(M)
+    lsums = jax.scipy.special.logsumexp(log_probs[i], axis=1)
+    return jnp.max(lsums)
+
+
+def allowed_region(log_probs: Array, n: Array, M: int = 5) -> Array:
+    # pmax <= 1-1/n
+    # logpmax <= log(1-1/n)
+    return log_pmax(log_probs, M) <= jnp.log1p(-1. / n)
 
 
 @jax.jit
