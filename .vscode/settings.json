@@ -10,5 +10,25 @@
     "python.testing.unittestEnabled": true,
     "python.testing.pytestArgs": [
         "tests"
+    ],
+    "[python]": {
+        "editor.defaultFormatter": "ms-python.autopep8",
+        "editor.codeActionsOnSave": {
+            "source.organizeImports.ruff": true,
+            "source.organizeImports": true
+          },
+        "editor.formatOnSave": true
+      },
+      "cSpell.words": [
+        "Bijector",
+        "jaxtyping",
+        "logprior",
+        "logsumexp",
+        "NNGSD",
+        "pmax",
+        "unnormalized",
+        "vmax",
+        "vmin"
     ]
+
 }

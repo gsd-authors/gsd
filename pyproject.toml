@@ -51,3 +51,6 @@ dependencies=["pytest","jaxlib>=0.4.6"]
 [tool.hatch.envs.default.scripts]
 test = "pytest {args:tests}"
 
+[tool.flake8]
+ignore = ['F841']
+max-line-length = 79

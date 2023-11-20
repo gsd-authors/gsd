@@ -1,9 +1,9 @@
 import unittest
+
 import jax.numpy as jnp
 
 import gsd.fit
-
-from src.gsd.fit import pairs, pmax, log_pmax
+from src.gsd.fit import log_pmax, pairs, pmax
 
 
 class FitTestCase(unittest.TestCase):
