@@ -14,8 +14,8 @@ N = 5
 
 
 def logbinom(n: ArrayLike, k: ArrayLike) -> Array:
-    """ Stable log of `n choose k` """
-    return -jnp.log1p(n) - betaln(n - k + 1., k + 1.)
+    """Stable log of `n choose k`"""
+    return -jnp.log1p(n) - betaln(n - k + 1.0, k + 1.0)
 
 
 def vmin(psi: ArrayLike) -> Array:
@@ -33,11 +33,11 @@ def vmax(psi: ArrayLike) -> Array:
     :param psi: mean
     :return: variance
     """
-    return (psi - 1.) * (5 - psi)
+    return (psi - 1.0) * (5 - psi)
 
 
 def _C(Vmax: ArrayLike, Vmin: ArrayLike) -> Array:
-    return jnp.where(Vmax != Vmin, 3. / 4. * Vmax / (Vmax - Vmin), 1.)
+    return jnp.where(Vmax != Vmin, 3.0 / 4.0 * Vmax / (Vmax - Vmin), 1.0)
 
 
 def log_prob(psi: ArrayLike, rho: ArrayLike, k: ArrayLike) -> Array:
@@ -55,22 +55,47 @@ def log_prob(psi: ArrayLike, rho: ArrayLike, k: ArrayLike) -> Array:
     Vmin = vmin(psi)
     Vmax = vmax(psi)
     C = _C(Vmax, Vmin)
-    beta_bin_part = logbinom(4, k - 1.) + jnp.sum(
-        jnp.where(index <= k - 2, jnp.log((psi - 1) * rho / 4 + index * (C - rho)), 0.)) + jnp.sum(
-        jnp.where(index <= 4 - k, jnp.log((5. - psi) * rho / 4 + index * (C - rho)), 0.)) - jnp.sum(
-        jnp.where(index <= 3, jnp.log(rho + index * (C - rho)), 0.))
+    beta_bin_part = (
+            logbinom(4, k - 1.0)
+            + jnp.sum(
+        jnp.where(
+            index <= k - 2, jnp.log((psi - 1) * rho / 4 + index * (C - rho)),
+            0.0
+        )
+    )
+            + jnp.sum(
+        jnp.where(
+            index <= 4 - k, jnp.log((5.0 - psi) * rho / 4 + index * (C - rho)),
+            0.0
+        )
+    )
+            - jnp.sum(
+        jnp.where(index <= 3, jnp.log(rho + index * (C - rho)), 0.0))
+    )
 
     b0 = jnp.log(jnp.zeros_like(index))
-    b0 = b0.at[0].set(jnp.log((5. - psi) / 4.))
-    b0 = b0.at[4].set(jnp.log((psi - 1.) / 4.))
+    b0 = b0.at[0].set(jnp.log((5.0 - psi) / 4.0))
+    b0 = b0.at[4].set(jnp.log((psi - 1.0) / 4.0))
     beta_bin_part = jnp.where(rho == 0.0, b0[k - 1], beta_bin_part)
 
-    min_var_part = jax.nn.relu(1. - jnp.abs(k - psi))
-    log_min_var_part = jnp.where(rho < C, 0., jnp.log(rho - C)) - jnp.log1p(-C) + jnp.log(min_var_part)
-    log_bin_part = jnp.log1p(-rho) - jnp.log1p(-C) + logbinom(4, k - 1.) + (k - 1) * (jnp.log(psi - 1) - jnp.log(4)) + (
-            5 - k) * (jnp.log(5 - psi) - jnp.log(4))
+    min_var_part = jax.nn.relu(1.0 - jnp.abs(k - psi))
+    log_min_var_part = (
+            jnp.where(rho < C, 0.0, jnp.log(rho - C))
+            - jnp.log1p(-C)
+            + jnp.log(min_var_part)
+    )
+    log_bin_part = (
+            jnp.log1p(-rho)
+            - jnp.log1p(-C)
+            + logbinom(4, k - 1.0)
+            + (k - 1) * (jnp.log(psi - 1) - jnp.log(4))
+            + (5 - k) * (jnp.log(5 - psi) - jnp.log(4))
+    )
 
-    logmix = jnp.logaddexp(jnp.where(min_var_part == 0, almost_neg_inf, log_min_var_part), log_bin_part)
+    logmix = jnp.logaddexp(
+        jnp.where(min_var_part == 0, almost_neg_inf, log_min_var_part),
+        log_bin_part
+    )
 
     logmix = jnp.where(rho == 1.0, jnp.log(min_var_part), logmix)
     # logmix = jnp.where(min_var_part == 0, log_bin_part, logmix)
@@ -89,7 +114,8 @@ def variance(psi: ArrayLike, rho: ArrayLike) -> Array:
     return rho * vmin(psi) + (1 - rho) * vmax(psi)
 
 
-def sample(psi: ArrayLike, rho: ArrayLike, shape: Shape, key: PRNGKeyArray) -> Array:
+def sample(psi: ArrayLike, rho: ArrayLike, shape: Shape,
+           key: PRNGKeyArray) -> Array:
     """Sample from GSD
 
     :param psi: mean
@@ -105,10 +131,10 @@ def sample(psi: ArrayLike, rho: ArrayLike, shape: Shape, key: PRNGKeyArray) -> A
 
 @jax.jit
 def sufficient_statistic(data: ArrayLike) -> Array:
-    """ Compute GSD sufficient statistic from samples.
+    """Compute GSD sufficient statistic from samples.
 
     :param data: Samples from GSD data[i] in [1..5]
-    :return: Counts of each possible values
+    :return: Counts of each possible value
     """
     data = jnp.asarray(data)
     _, cu = jnp.unique(data, return_counts=True, size=N)

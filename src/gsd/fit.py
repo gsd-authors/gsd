@@ -12,11 +12,12 @@ from .gsd import log_prob, vmax, vmin
 
 
 class GSDParams(NamedTuple):
-    """NamedTuple representing parameters for the Generalized Score Distribution (GSD).
+    """NamedTuple representing parameters for the Generalized Score
+    Distribution (GSD).
 
-    This class is used to store the psi and  rho parameters for the GSD.
-    It provides a convenient way to group these parameters together for use in various
-    statistical and modeling applications.
+    This class is used to store the psi and  rho parameters for the GSD. It
+    provides a convenient way to group these parameters together for use in
+    various statistical and modeling applications.
     """
 
     psi: Array
@@ -82,35 +83,31 @@ class OptState(NamedTuple):
 
 
 @partial(jax.jit, static_argnames=["constrain_by_pmax"])
-def fit_mle(
-        data: ArrayLike,
-        max_iterations: int = 100,
-        log_lr_min: ArrayLike = -15,
-        log_lr_max: ArrayLike = 2.0,
-        num_lr: ArrayLike = 10,
-        constrain_by_pmax=False,
-) -> tuple[GSDParams, OptState]:
-    """Finds the maximum likelihood estimator of the GSD parameters.
-    The algorithm used here is a simple gradient ascent.
-    We use the concept of projected gradient to enforce constraints for parameters
-    (psi in [1, 5], rho in [0, 1]) and exhaustive search for line search along the gradient.
+def fit_mle(data: ArrayLike, max_iterations: int = 100,
+            log_lr_min: ArrayLike = -15, log_lr_max: ArrayLike = 2.0,
+            num_lr: ArrayLike = 10, constrain_by_pmax=False, ) -> tuple[
+    GSDParams, OptState]:
+    """Finds the maximum likelihood estimator of the GSD parameters. The
+    algorithm used here is a simple gradient ascent. We use the concept of
+    projected gradient to enforce constraints for parameters (psi in [1, 5],
+    rho in [0, 1]) and exhaustive search for line search along the gradient.
 
-    :param data: An array of counts for each response.
-    :param max_iterations: Maximum number of iterations.
-    :param log_lr_min: Log2 of the smallest learning rate.
-    :param log_lr_max: Log2 of the largest learning rate.
-    :param num_lr: Number of learning rates to check during the line search.
-    :param constrain_by_pmax: Bool flag whether for add constrain described in Appendix D
+    :param data: An array of counts for each response. :param
+    max_iterations: Maximum number of iterations. :param log_lr_min: Log2 of
+    the smallest learning rate. :param log_lr_max: Log2 of the largest
+    learning rate. :param num_lr: Number of learning rates to check during
+    the line search. :param constrain_by_pmax: Bool flag whether for add
+    constrain described in Appendix D
 
-    :return: An opt state whore params filed contains estimated values of GSD Parameters
+    :return: An opt state whore params filed contains estimated values of
+    GSD Parameters
     """
 
     data = jnp.asarray(data)
 
     def make_logits(theta: GSDParams) -> Array:
-        logits = jax.vmap(log_prob, (None, None, 0), (0))(
-            theta.psi, theta.rho, jnp.arange(1, 6)
-        )
+        logits = jax.vmap(log_prob, (None, None, 0), 0)(theta.psi, theta.rho,
+                                                        jnp.arange(1, 6))
         return logits
 
     def ll(theta: GSDParams) -> Array:
@@ -123,10 +120,9 @@ def fit_mle(
     else:
         theta0 = fit_moments(data)
 
-    rate = jnp.concatenate(
-        [jnp.zeros((1,)), jnp.logspace(
-            log_lr_min, log_lr_max, num_lr, base=2.0)]
-    )
+    rate = jnp.concatenate([jnp.zeros((1,)),
+                            jnp.logspace(log_lr_min, log_lr_max, num_lr,
+                                         base=2.0)])
 
     def update(tg, t, lo, hi):
         """
@@ -155,36 +151,29 @@ def fit_mle(
         if constrain_by_pmax:
             n = jnp.sum(data)
             logits = jax.vmap(make_logits)(new_theta)
-            is_in_region = jax.vmap(
-                allowed_region, in_axes=(0, None))(logits, n)
-            # jax.debug.print("in region {is_in_region}",is_in_region=is_in_region)
+            is_in_region = jax.vmap(allowed_region, in_axes=(0, None))(logits,
+                                                                       n)
+            # jax.debug.print("in region {is_in_region}",
+            # is_in_region=is_in_region)
             new_lls = jnp.where(is_in_region, new_lls, -jnp.inf)
 
         max_idx = jnp.argmax(new_lls)
         # jax.debug.print("{max_idx}||| {new_lls}",max_idx=max_idx,new_lls=new_lls)
-        return OptState(
-            params=jtu.tree_map(lambda t: t[max_idx], new_theta),
-            previous_params=t,
-            count=count + 1,
-        )
+        return OptState(params=jtu.tree_map(lambda t: t[max_idx], new_theta),
+                        previous_params=t, count=count + 1, )
 
-    def cond_fun(state: OptState) -> bool:
+    def cond_fun(state: OptState) -> Array:
         tn, tnm1, c = state
-        should_stop = jnp.logical_or(
-            jnp.all(jnp.array(tn) == jnp.array(tnm1)), c > max_iterations
-        )
+        should_stop = jnp.logical_or(jnp.all(jnp.array(tn) == jnp.array(tnm1)),
+                                     c > max_iterations)
         # stop on NaN
-        should_stop = jnp.logical_or(
-            should_stop, jnp.any(jnp.isnan(jnp.array(tn))))
+        should_stop = jnp.logical_or(should_stop,
+                                     jnp.any(jnp.isnan(jnp.array(tn))))
         return jnp.logical_not(should_stop)
 
-    opt_state = jax.lax.while_loop(
-        cond_fun,
-        body_fun,
-        OptState(
-            params=theta0,
-            previous_params=jtu.tree_map(lambda _: jnp.inf, theta0),
-            count=0,
-        ),
-    )
+    opt_state = jax.lax.while_loop(cond_fun, body_fun,
+                                   OptState(params=theta0,
+                                            previous_params=jtu.tree_map(
+                                                lambda _: jnp.inf, theta0),
+                                            count=0, ), )
     return opt_state.params, opt_state

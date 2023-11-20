@@ -46,11 +46,8 @@ include = [
 ]
 
 [tool.hatch.envs.default]
-dependencies=["pytest","jaxlib>=0.4.6"]
+dependencies=["jaxlib>=0.4.6"]
 
 [tool.hatch.envs.default.scripts]
-test = "pytest {args:tests}"
+test = "python -m unittest discover -p '*test.py'"
 
-[tool.flake8]
-ignore = ['F841']
-max-line-length = 79
