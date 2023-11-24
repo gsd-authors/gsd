@@ -63,7 +63,7 @@ def fit_moments(data: ArrayLike) -> GSDParams:
     V = jnp.dot(data, jnp.arange(1, 6) ** 2) / jnp.sum(data) - psi ** 2
     vma = vmax(psi)
     vmi = vmin(psi)
-    rho = jnp.where(vma==vmi, 1., (vmax(psi) - V) / ( vma-vmi) )
+    rho = jnp.where(jnp.allclose(vma,vmi), 1., (vmax(psi) - V) / ( vma-vmi) )
     return GSDParams(psi=psi, rho=rho)
 
 
