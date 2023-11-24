@@ -21,6 +21,18 @@ class FitTestCase(unittest.TestCase):
         self.assertNotAlmostEqual(os.params.psi, 2.5)
         self.assertNotAlmostEqual(os.params.rho, 1)
 
+    def test_mle_single(self):
+        data = [20,0,0,0,0.]
+
+        params, os = gsd.fit.fit_mle(data, constrain_by_pmax=False)
+        self.assertFalse(jnp.isnan(params.psi))
+        self.assertFalse(jnp.isnan(params.rho))
+
+        params, os = gsd.fit.fit_mle(data, constrain_by_pmax=True)
+        self.assertFalse(jnp.isnan(params.psi))
+        self.assertFalse(jnp.isnan(params.rho))
+
+
     def test_list(self):
         #     1  2  3 4 5
         data = [0, 10, 10, 0, 0.]
