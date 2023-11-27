@@ -85,7 +85,7 @@ class OptState(NamedTuple):
     count: int
 
 
-@partial(jax.jit, static_argnames=["constrain_by_pmax"])
+@partial(jax.jit, static_argnums=[1,2,3,4,5])
 def fit_mle(data: ArrayLike, max_iterations: int = 100,
             log_lr_min: ArrayLike = -15, log_lr_max: ArrayLike = 2.0,
             num_lr: ArrayLike = 10, constrain_by_pmax=False, ) -> tuple[
