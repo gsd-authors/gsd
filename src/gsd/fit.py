@@ -84,6 +84,11 @@ class OptState(NamedTuple):
     previous_params: GSDParams
     count: int
 
+def make_logits(theta: GSDParams) -> Array:
+    logits = jax.vmap(log_prob, (None, None, 0))(theta.psi, theta.rho,
+                                                    jnp.arange(1, 6))
+    return logits
+
 
 @partial(jax.jit, static_argnums=[1,2,3,4,5])
 def fit_mle(data: ArrayLike, max_iterations: int = 100,
@@ -108,20 +113,19 @@ def fit_mle(data: ArrayLike, max_iterations: int = 100,
 
     data = jnp.asarray(data)
 
-    def make_logits(theta: GSDParams) -> Array:
-        logits = jax.vmap(log_prob, (None, None, 0), 0)(theta.psi, theta.rho,
-                                                        jnp.arange(1, 6))
-        return logits
+
 
     def ll(theta: GSDParams) -> Array:
         logits = make_logits(theta)
         return jnp.dot(data, logits) / jnp.sum(data)
 
     grad_ll = jax.grad(ll)
-    if constrain_by_pmax:
+
+    if constrain_by_pmax :
         theta0 = GSDParams(psi=3.0, rho=0.5)
     else:
         theta0 = fit_moments(data)
+
 
     rate = jnp.concatenate([jnp.zeros((1,)),
                             jnp.logspace(log_lr_min, log_lr_max, num_lr,
@@ -146,6 +150,7 @@ def fit_mle(data: ArrayLike, max_iterations: int = 100,
     def body_fun(state: OptState) -> OptState:
         t, _, count = state
         g = grad_ll(t)
+        jax.debug.print("grad {0} {1}", *g)
         new_theta = jtu.tree_map(update, g, t, lo, hi)
         new_lls = jax.vmap(ll)(new_theta)
         # filter nan
@@ -161,9 +166,11 @@ def fit_mle(data: ArrayLike, max_iterations: int = 100,
             new_lls = jnp.where(is_in_region, new_lls, -jnp.inf)
 
         max_idx = jnp.argmax(new_lls)
-        # jax.debug.print("{max_idx}||| {new_lls}",max_idx=max_idx,new_lls=new_lls)
-        return OptState(params=jtu.tree_map(lambda t: t[max_idx], new_theta),
+        #jax.debug.print("{max_idx}||| {new_lls}",max_idx=max_idx,new_lls=new_lls)
+        ret= OptState(params=jtu.tree_map(lambda t: t[max_idx], new_theta),
                         previous_params=t, count=count + 1, )
+        #jax.debug.print("body: {0} {1}",*ret.params)
+        return ret
 
     def cond_fun(state: OptState) -> Array:
         tn, tnm1, c = state
