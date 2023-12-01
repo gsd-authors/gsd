@@ -47,3 +47,4 @@ nav:
     - 'api.md'
     - Colab: 'examples/colab.ipynb'
     - Bayes: 'examples/bayes.ipynb'
+    - scipy: 'examples/scipy.ipynb'

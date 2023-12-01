@@ -2,6 +2,7 @@ from functools import partial
 from typing import NamedTuple
 
 import jax
+import numpy as np
 from jax import numpy as jnp, Array, tree_util as jtu
 from jax._src.basearray import ArrayLike
 
@@ -27,7 +28,7 @@ class OptState(NamedTuple):
     count: int
 
 
-@partial(jax.jit, static_argnums=[1,2,3,4,5])
+@partial(jax.jit, static_argnums=[1, 2, 3, 4, 5])
 def fit_mle(data: ArrayLike, max_iterations: int = 100,
             log_lr_min: ArrayLike = -15, log_lr_max: ArrayLike = 2.0,
             num_lr: ArrayLike = 10, constrain_by_pmax=False, ) -> tuple[
@@ -37,20 +38,22 @@ def fit_mle(data: ArrayLike, max_iterations: int = 100,
     projected gradient to enforce constraints for parameters (psi in [1, 5],
     rho in [0, 1]) and exhaustive search for line search along the gradient.
 
-    :param data: An array of counts for each response. :param
-    max_iterations: Maximum number of iterations. :param log_lr_min: Log2 of
-    the smallest learning rate. :param log_lr_max: Log2 of the largest
-    learning rate. :param num_lr: Number of learning rates to check during
-    the line search. :param constrain_by_pmax: Bool flag whether for add
-    constrain described in Appendix D
+    *Since the mass function is not smooth, a gradient-based estimator can fail*
 
+    :param data: An array of counts for each response.
+    :param max_iterations: Maximum number of iterations.
+    :param log_lr_min: Log2 of
+    the smallest learning rate.
+    :param log_lr_max: Log2 of the largest
+    learning rate.
+    :param num_lr: Number of learning rates to check during
+    the line search.
+   
     :return: An opt state whore params filed contains estimated values of
     GSD Parameters
     """
 
     data = jnp.asarray(data)
-
-
 
     def ll(theta: GSDParams) -> Array:
         logits = make_logits(theta)
@@ -58,11 +61,7 @@ def fit_mle(data: ArrayLike, max_iterations: int = 100,
 
     grad_ll = jax.grad(ll)
 
-    if constrain_by_pmax :
-        theta0 = GSDParams(psi=3.0, rho=0.5)
-    else:
-        theta0 = fit_moments(data)
-
+    theta0 = fit_moments(data)
 
     rate = jnp.concatenate([jnp.zeros((1,)),
                             jnp.logspace(log_lr_min, log_lr_max, num_lr,
@@ -77,8 +76,7 @@ def fit_mle(data: ArrayLike, max_iterations: int = 100,
         :return: updated params
         """
         nt = t + rate * jnp.where(jnp.isnan(tg), 0.0, tg)
-        _nt = jnp.where(nt < lo, lo, nt)
-        _nt = jnp.where(_nt > hi, hi, _nt)
+        _nt = jnp.clip(nt, lo, hi)
         return _nt
 
     lo = GSDParams(psi=1.0, rho=0.0)
@@ -92,21 +90,11 @@ def fit_mle(data: ArrayLike, max_iterations: int = 100,
         new_lls = jax.vmap(ll)(new_theta)
         # filter nan
         new_lls = jnp.where(jnp.isnan(new_lls), -jnp.inf, new_lls)
-        # filter pmax
-        if constrain_by_pmax:
-            n = jnp.sum(data)
-            logits = jax.vmap(make_logits)(new_theta)
-            is_in_region = jax.vmap(allowed_region, in_axes=(0, None))(logits,
-                                                                       n)
-            # jax.debug.print("in region {is_in_region}",
-            # is_in_region=is_in_region)
-            new_lls = jnp.where(is_in_region, new_lls, -jnp.inf)
-
         max_idx = jnp.argmax(new_lls)
-        #jax.debug.print("{max_idx}||| {new_lls}",max_idx=max_idx,new_lls=new_lls)
-        ret= OptState(params=jtu.tree_map(lambda t: t[max_idx], new_theta),
-                        previous_params=t, count=count + 1, )
-        #jax.debug.print("body: {0} {1}",*ret.params)
+        # jax.debug.print("{max_idx}||| {new_lls}",max_idx=max_idx,new_lls=new_lls)
+        ret = OptState(params=jtu.tree_map(lambda t: t[max_idx], new_theta),
+                       previous_params=t, count=count + 1, )
+        # jax.debug.print("body: {0} {1}",*ret.params)
         return ret
 
     def cond_fun(state: OptState) -> Array:
@@ -126,3 +114,50 @@ def fit_mle(data: ArrayLike, max_iterations: int = 100,
     return opt_state.params, opt_state
 
 
+def _make_map(psis, rhos, n):
+    f = lambda psi, rho: allowed_region(
+        make_logits(GSDParams(psi=psi, rho=rho)), n)
+    f = jax.vmap(f, in_axes=(0, None))
+    f = jax.vmap(f, in_axes=(None, 0))
+    return f(psis, rhos)
+
+
+def fit_mle_grid(data: ArrayLike, num: GSDParams,
+                 constrain_by_pmax=False) -> GSDParams:
+    """Fit GSD using naive grid search method.
+    This function uses `numpy` and cannot be used in `jit`
+
+        >>> data = jnp.asarray([20, 0, 0, 0, 0.0])
+        >>> theta = fit_mle_grid(data, GSDParams(32,32),False)
+
+
+    :param data: An array of counts for each response.
+    :param num: Number of search for each parameter
+    :param constrain_by_pmax: Bool flag whether add
+    constrain described in Appendix D
+
+    :return: Fitted parameters
+    """
+    lo = GSDParams(psi=1., rho=0.)
+    hi = GSDParams(psi=5., rho=1.)
+
+    grid_exes = jtu.tree_map(jnp.linspace, lo, hi, num)
+
+    def ll(psi, rho) -> Array:
+        return jnp.dot(jnp.asarray(data), make_logits(GSDParams(psi=psi, rho=rho)))
+
+    grid_ll = jax.vmap(ll, in_axes=(0, None))
+    grid_ll = jax.vmap(grid_ll, in_axes=(None, 0))
+    grid_ll = jax.jit(grid_ll)
+
+    lls = grid_ll(grid_exes.psi, grid_exes.rho)
+
+    if constrain_by_pmax:
+        tv = jax.jit(_make_map)(grid_exes.psi, grid_exes.rho, data.sum())
+        i, j = np.where(tv)
+    else:
+        tv = jnp.ones_like(lls)
+        i, j = np.where(tv)
+
+    k = np.argmax(lls[i, j])
+    return GSDParams(psi=grid_exes.psi[j[k]], rho=grid_exes.rho[i[k]])

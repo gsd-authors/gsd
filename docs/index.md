@@ -52,10 +52,9 @@ pip install ref_gsd
 ***Note that you install `ref_gsd` but import `gsd` e.g.***
 
 ```python
-import gsd.experimental
 import gsd
 
-gsd.experimental.fit_mle([2, 8, 2, 0, 0.])
+gsd.experimental.fit_moments([2, 8, 2, 0, 0.])
 ```
 
 ## Development
