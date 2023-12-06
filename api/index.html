@@ -332,23 +332,49 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#gsd.fit_mle" class="md-nav__link">
-    fit_mle()
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#gsd.fit_moments" class="md-nav__link">
     fit_moments()
   </a>
   
+    <nav class="md-nav" aria-label="fit_moments()">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#constrained-parameter-space" class="md-nav__link">
+    Constrained parameter space
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
 </li>
       
         <li class="md-nav__item">
+  <a href="#gsd.fit.log_pmax" class="md-nav__link">
+    log_pmax()
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#gsd.fit.allowed_region" class="md-nav__link">
+    allowed_region()
+  </a>
+  
+    <nav class="md-nav" aria-label="allowed_region()">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
   <a href="#structures" class="md-nav__link">
     Structures
   </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -360,9 +386,43 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#gsd.fit.OptState" class="md-nav__link">
+  <a href="#experimental" class="md-nav__link">
+    Experimental
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#gsd.experimental" class="md-nav__link">
+    experimental
+  </a>
+  
+    <nav class="md-nav" aria-label="experimental">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#gsd.experimental.OptState" class="md-nav__link">
     OptState
   </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gsd.experimental.fit_mle" class="md-nav__link">
+    fit_mle()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gsd.experimental.fit_mle_grid" class="md-nav__link">
+    fit_mle_grid()
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
   
 </li>
       
@@ -404,6 +464,25 @@
   
   <span class="md-ellipsis">
     Bayes
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../examples/scipy/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    scipy
   </span>
   
 
@@ -639,7 +718,8 @@ E.g.  <code>𝚷(i for i in ℤ[1,3])</code> is a valid python code for </p>
 
   </div>
 
-</div>
+</div><hr />
+
 
 
 <div class="doc doc-object doc-function">
@@ -755,7 +835,8 @@ E.g.  <code>𝚷(i for i in ℤ[1,3])</code> is a valid python code for </p>
 
   </div>
 
-</div>
+</div><hr />
+
 
 
 <div class="doc doc-object doc-function">
@@ -775,7 +856,8 @@ E.g.  <code>𝚷(i for i in ℤ[1,3])</code> is a valid python code for </p>
 
   </div>
 
-</div>
+</div><hr />
+
 
 
 <div class="doc doc-object doc-function">
@@ -795,7 +877,8 @@ E.g.  <code>𝚷(i for i in ℤ[1,3])</code> is a valid python code for </p>
 
   </div>
 
-</div>
+</div><hr />
+
 
 
 <div class="doc doc-object doc-function">
@@ -860,7 +943,7 @@ E.g.  <code>𝚷(i for i in ℤ[1,3])</code> is a valid python code for </p>
           </td>
           <td>
             <div class="doc-md-description">
-              <p>Counts of each possible values</p>
+              <p>Counts of each possible value</p>
             </div>
           </td>
         </tr>
@@ -870,141 +953,11 @@ E.g.  <code>𝚷(i for i in ℤ[1,3])</code> is a valid python code for </p>
   </div>
 
 </div><h2 id="fit">Fit<a class="headerlink" href="#fit" title="Permanent link">¤</a></h2>
-<p>We provide two estimators. 
-The simple one based on moments and the maximum likelihood estimator.</p>
+<p>We provide few estimators. The simple one is based on moments. 
+A more advanced gradient-based estimator maximum likelihood estimator is 
+provided in <code>gsd.experimental</code>. We also provide a naive grid search MLE.
+Besides the high-level API one can use optimizers form <code>scipy</code> or <code>tensorflow_probability</code>.   </p>
 
-
-
-<div class="doc doc-object doc-function">
-
-
-
-
-<h2 id="gsd.fit_mle" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">gsd</span><span class="o">.</span><span class="n">fit_mle</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">max_iterations</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">log_lr_min</span><span class="o">=-</span><span class="mi">15</span><span class="p">,</span> <span class="n">log_lr_max</span><span class="o">=</span><span class="mf">2.0</span><span class="p">,</span> <span class="n">num_lr</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span></code>
-
-<a href="#gsd.fit_mle" class="headerlink" title="Permanent link">¤</a></h2>
-
-
-  <div class="doc doc-contents first">
-  
-      <p>Finds the maximum likelihood estimator of the GSD parameters.
-The algorithm used here is a simple gradient ascent.
-We use the concept of projected gradient to enforce constraints for parameters (psi in [1, 5], rho in [0, 1]) and exhaustive search for line search along the gradient.</p>
-
-
-
-  <p><strong>Parameters:</strong></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Type</th>
-        <th>Description</th>
-        <th>Default</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr>
-          <td><code>data</code></td>
-          <td>
-                <code><span title="jax.typing.ArrayLike">ArrayLike</span></code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>An array of counts for each response.</p>
-            </div>
-          </td>
-          <td>
-              <em>required</em>
-          </td>
-        </tr>
-        <tr>
-          <td><code>max_iterations</code></td>
-          <td>
-                <code>int</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Maximum number of iterations.</p>
-            </div>
-          </td>
-          <td>
-                <code>100</code>
-          </td>
-        </tr>
-        <tr>
-          <td><code>log_lr_min</code></td>
-          <td>
-                <code><span title="jax.typing.ArrayLike">ArrayLike</span></code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Log2 of the smallest learning rate.</p>
-            </div>
-          </td>
-          <td>
-                <code>-15</code>
-          </td>
-        </tr>
-        <tr>
-          <td><code>log_lr_max</code></td>
-          <td>
-                <code><span title="jax.typing.ArrayLike">ArrayLike</span></code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Log2 of the largest learning rate.</p>
-            </div>
-          </td>
-          <td>
-                <code>2.0</code>
-          </td>
-        </tr>
-        <tr>
-          <td><code>num_lr</code></td>
-          <td>
-                <code><span title="jax.typing.ArrayLike">ArrayLike</span></code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Number of learning rates to check during the line search.</p>
-            </div>
-          </td>
-          <td>
-                <code>10</code>
-          </td>
-        </tr>
-    </tbody>
-  </table>
-
-
-
-  <p><strong>Returns:</strong></p>
-  <table>
-    <thead>
-      <tr>
-        <th>Type</th>
-        <th>Description</th>
-      </tr>
-    </thead>
-    <tbody>
-        <tr>
-          <td>
-                <code>tuple[<a class="autorefs autorefs-internal" title="gsd.fit.GSDParams" href="#gsd.fit.GSDParams">GSDParams</a>, <a class="autorefs autorefs-internal" title="gsd.fit.OptState" href="#gsd.fit.OptState">OptState</a>]</code>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>An opt state whore params filed contains estimated values of GSD Parameters</p>
-            </div>
-          </td>
-        </tr>
-    </tbody>
-  </table>
-
-  </div>
-
-</div>
 
 
 <div class="doc doc-object doc-function">
@@ -1020,7 +973,7 @@ We use the concept of projected gradient to enforce constraints for parameters (
 
   <div class="doc doc-contents first">
   
-      <p>Fits GSD using moments estimator</p>
+      <p>Fits GSD using moment estimator</p>
 
 
 
@@ -1078,7 +1031,172 @@ We use the concept of projected gradient to enforce constraints for parameters (
 
   </div>
 
-</div><h2 id="structures">Structures<a class="headerlink" href="#structures" title="Permanent link">¤</a></h2>
+</div><h3 id="constrained-parameter-space">Constrained parameter space<a class="headerlink" href="#constrained-parameter-space" title="Permanent link">¤</a></h3>
+
+
+
+<div class="doc doc-object doc-function">
+
+
+
+
+<h2 id="gsd.fit.log_pmax" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">gsd</span><span class="o">.</span><span class="n">fit</span><span class="o">.</span><span class="n">log_pmax</span><span class="p">(</span><span class="n">log_probs</span><span class="p">)</span></code>
+
+<a href="#gsd.fit.log_pmax" class="headerlink" title="Permanent link">¤</a></h2>
+
+
+  <div class="doc doc-contents first">
+  
+      <p>Calculate the maximum of log of the sum of two probabilities from logarithsms of probabilities</p>
+
+
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>log_probs</code></td>
+          <td>
+                <code><span title="jax.Array">Array</span></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>logarithsms of probabilities</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+
+  <p><strong>Returns:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td>
+                <code><span title="jax.Array">Array</span></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>Scalar array</p>
+            </div>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+
+<h2 id="gsd.fit.allowed_region" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">gsd</span><span class="o">.</span><span class="n">fit</span><span class="o">.</span><span class="n">allowed_region</span><span class="p">(</span><span class="n">log_probs</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span></code>
+
+<a href="#gsd.fit.allowed_region" class="headerlink" title="Permanent link">¤</a></h2>
+
+
+  <div class="doc doc-contents first">
+  
+      <p>Compute whether given log_probs satisfy conditions <code>pmax &lt;= 1-1/n</code> as
+described in Appendix D.
+This is computed in the log domain as <code>logpmax &lt;= log(1-1/n)</code>.</p>
+
+
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>log_probs</code></td>
+          <td>
+                <code><span title="jax.Array">Array</span></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>logarithsms of probabilities</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr>
+          <td><code>n</code></td>
+          <td>
+                <code><span title="jax.Array">Array</span></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>Total number of obserwations</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+
+  <p><strong>Returns:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td>
+                <code><span title="jax.Array">Array</span></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>Binary array</p>
+            </div>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+  </div>
+
+</div><h3 id="structures">Structures<a class="headerlink" href="#structures" title="Permanent link">¤</a></h3>
 
 
 <div class="doc doc-object doc-class">
@@ -1098,10 +1216,11 @@ We use the concept of projected gradient to enforce constraints for parameters (
             Bases: <code><span title="typing.NamedTuple">NamedTuple</span></code></p>
 
   
-      <p>NamedTuple representing parameters for the Generalized Score Distribution (GSD).</p>
-<p>This class is used to store the psi and  rho parameters for the GSD.
-It provides a convenient way to group these parameters together for use in various
-statistical and modeling applications.</p>
+      <p>NamedTuple representing parameters for the Generalized Score
+Distribution (GSD).</p>
+<p>This class is used to store the psi and  rho parameters for the GSD. It
+provides a convenient way to group these parameters together for use in
+various statistical and modeling applications.</p>
 
 
   
@@ -1122,21 +1241,46 @@ statistical and modeling applications.</p>
 
   </div>
 
-</div>
+</div><h2 id="experimental">Experimental<a class="headerlink" href="#experimental" title="Permanent link">¤</a></h2>
+
+
+<div class="doc doc-object doc-module">
+
+
+
+
+<h2 id="gsd.experimental" class="doc doc-heading">
+          <code>gsd.experimental</code>
+
+
+<a href="#gsd.experimental" class="headerlink" title="Permanent link">¤</a></h2>
+
+  <div class="doc doc-contents first">
+
+  
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
 
 <div class="doc doc-object doc-class">
 
 
 
 
-<h2 id="gsd.fit.OptState" class="doc doc-heading">
-          <code>gsd.fit.OptState</code>
+<h3 id="gsd.experimental.OptState" class="doc doc-heading">
+          <code>OptState</code>
 
 
-<a href="#gsd.fit.OptState" class="headerlink" title="Permanent link">¤</a></h2>
+<a href="#gsd.experimental.OptState" class="headerlink" title="Permanent link">¤</a></h3>
 
 
-  <div class="doc doc-contents first">
+  <div class="doc doc-contents ">
           <p class="doc doc-class-bases">
             Bases: <code><span title="typing.NamedTuple">NamedTuple</span></code></p>
 
@@ -1200,6 +1344,254 @@ statistical and modeling applications.</p>
 
 
 
+
+
+
+  </div>
+
+  </div>
+
+</div>
+
+
+
+<div class="doc doc-object doc-function">
+
+
+
+
+<h3 id="gsd.experimental.fit_mle" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">fit_mle</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">max_iterations</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">log_lr_min</span><span class="o">=-</span><span class="mi">15</span><span class="p">,</span> <span class="n">log_lr_max</span><span class="o">=</span><span class="mf">2.0</span><span class="p">,</span> <span class="n">num_lr</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">constrain_by_pmax</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></code>
+
+<a href="#gsd.experimental.fit_mle" class="headerlink" title="Permanent link">¤</a></h3>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Finds the maximum likelihood estimator of the GSD parameters. The
+algorithm used here is a simple gradient ascent. We use the concept of
+projected gradient to enforce constraints for parameters (psi in [1, 5],
+rho in [0, 1]) and exhaustive search for line search along the gradient.</p>
+<p><em>Since the mass function is not smooth, a gradient-based estimator can fail</em></p>
+
+
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>data</code></td>
+          <td>
+                <code><span title="jax._src.basearray.ArrayLike">ArrayLike</span></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>An array of counts for each response.</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr>
+          <td><code>max_iterations</code></td>
+          <td>
+                <code>int</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>Maximum number of iterations.</p>
+            </div>
+          </td>
+          <td>
+                <code>100</code>
+          </td>
+        </tr>
+        <tr>
+          <td><code>log_lr_min</code></td>
+          <td>
+                <code><span title="jax._src.basearray.ArrayLike">ArrayLike</span></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>Log2 of the smallest learning rate.</p>
+            </div>
+          </td>
+          <td>
+                <code>-15</code>
+          </td>
+        </tr>
+        <tr>
+          <td><code>log_lr_max</code></td>
+          <td>
+                <code><span title="jax._src.basearray.ArrayLike">ArrayLike</span></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>Log2 of the largest learning rate.</p>
+            </div>
+          </td>
+          <td>
+                <code>2.0</code>
+          </td>
+        </tr>
+        <tr>
+          <td><code>num_lr</code></td>
+          <td>
+                <code><span title="jax._src.basearray.ArrayLike">ArrayLike</span></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>Number of learning rates to check during the line search.</p>
+            </div>
+          </td>
+          <td>
+                <code>10</code>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+
+  <p><strong>Returns:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td>
+                <code>tuple[<a class="autorefs autorefs-internal" title="gsd.GSDParams" href="#gsd.fit.GSDParams">GSDParams</a>, <a class="autorefs autorefs-internal" title="gsd.experimental.OptState" href="#gsd.experimental.OptState">OptState</a>]</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>An opt state whore params filed contains estimated values of GSD Parameters</p>
+            </div>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+
+<h3 id="gsd.experimental.fit_mle_grid" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">fit_mle_grid</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">num</span><span class="p">,</span> <span class="n">constrain_by_pmax</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></code>
+
+<a href="#gsd.experimental.fit_mle_grid" class="headerlink" title="Permanent link">¤</a></h3>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Fit GSD using naive grid search method.
+This function uses <code>numpy</code> and cannot be used in <code>jit</code></p>
+<pre><code>&gt;&gt;&gt; data = jnp.asarray([20, 0, 0, 0, 0.0])
+&gt;&gt;&gt; theta = fit_mle_grid(data, GSDParams(32,32),False)
+</code></pre>
+
+
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>data</code></td>
+          <td>
+                <code><span title="jax._src.basearray.ArrayLike">ArrayLike</span></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>An array of counts for each response.</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr>
+          <td><code>num</code></td>
+          <td>
+                <code><a class="autorefs autorefs-internal" title="gsd.GSDParams" href="#gsd.fit.GSDParams">GSDParams</a></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>Number of search for each parameter</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr>
+          <td><code>constrain_by_pmax</code></td>
+          <td>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>Bool flag whether add constrain described in Appendix D</p>
+            </div>
+          </td>
+          <td>
+                <code>False</code>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+
+  <p><strong>Returns:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td>
+                <code><a class="autorefs autorefs-internal" title="gsd.GSDParams" href="#gsd.fit.GSDParams">GSDParams</a></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>Fitted parameters</p>
+            </div>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+  </div>
+
+</div>
 
 
 
