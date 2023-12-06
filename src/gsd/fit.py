@@ -1,114 +1,93 @@
+import itertools as it
 from typing import NamedTuple
 
 import jax
 import jax.numpy as jnp
-import jax.tree_util as jtu
 from jax import Array
 from jax.typing import ArrayLike
 
-from .gsd import vmax, vmin, log_prob
+from .gsd import log_prob, vmax, vmin
 
 
 class GSDParams(NamedTuple):
-    """NamedTuple representing parameters for the Generalized Score Distribution (GSD).
+    """NamedTuple representing parameters for the Generalized Score
+    Distribution (GSD).
 
-    This class is used to store the psi and  rho parameters for the GSD.
-    It provides a convenient way to group these parameters together for use in various
-    statistical and modeling applications.
+    This class is used to store the psi and  rho parameters for the GSD. It
+    provides a convenient way to group these parameters together for use in
+    various statistical and modeling applications.
     """
+
     psi: Array
     rho: Array
 
 
+def pairs(M: int = 5) -> Array:
+    comb = it.combinations(range(0, M), 2)
+    a = jnp.asarray(list(comb))
+    return a
+
+
+def pmax(probs: Array) -> Array:
+    """Calculate the maximum of the sum of two probabilities
+
+    :param probs: probabilities array
+    :param M: Number of classes
+    :return:
+    """
+    i = pairs(probs.shape[0])
+    sums = jnp.sum(probs[i], axis=1)
+    return jnp.max(sums)
+
+
+def log_pmax(log_probs: Array) -> Array:
+    """ Calculate the maximum of log of the sum of two probabilities from logarithsms of probabilities
+
+    :param log_probs: logarithsms of probabilities
+    :return: Scalar array
+    """
+    i = pairs(log_probs.shape[0])
+    lsums = jax.scipy.special.logsumexp(log_probs[i], axis=1)
+    return jnp.max(lsums)
+
+
+def allowed_region(log_probs: Array, n: Array) -> Array:
+    """Compute whether given log_probs satisfy conditions ``pmax <= 1-1/n`` as
+    described in Appendix D.
+    This is computed in the log domain as ``logpmax <= log(1-1/n)``.
+
+    :param log_probs: logarithsms of probabilities
+    :param n: Total number of obserwations
+    :return: Binary array
+    """
+
+    return log_pmax(log_probs) <= jnp.log1p(-1.0 / n)
+
+
 @jax.jit
 def fit_moments(data: ArrayLike) -> GSDParams:
-    """Fits GSD using moments estimator
+    """Fits GSD using moment estimator
 
     :param data: An Array of counts of each response.
     :return: GSD Parameters
     """
 
-    data= jnp.asarray(data)
+    data = jnp.asarray(data)
     psi = jnp.dot(data, jnp.arange(1, 6)) / jnp.sum(data)
     V = jnp.dot(data, jnp.arange(1, 6) ** 2) / jnp.sum(data) - psi ** 2
-    return GSDParams(psi=psi, rho=(vmax(psi) - V) / (vmax(psi) - vmin(psi)))
+    vma = vmax(psi)
+    vmi = vmin(psi)
+    rho = jnp.where(jnp.allclose(vma,vmi), 0.5, (vmax(psi) - V) / ( vma-vmi) )
+    return GSDParams(psi=psi, rho=rho)
 
 
-class OptState(NamedTuple):
-    """A class representing the state of an optimization process.
-
-    Attributes:
-    :param params (GSDParams): The current optimization parameters.
-    :param previous_params (GSDParams): The previous optimization parameters.
-    :param count (int): An integer count indicating the step or iteration of the optimization process.
-
-    This class is used to store and manage the state of an optimization algorithm, allowing you
-    to keep track of the current parameters, previous parameters, and the step count.
-
+def make_logits(theta: GSDParams) -> Array:
+    """Helper function making log probabilities for each answer
+    :param theta: GSD parameter
+    :return: Array of logits
     """
-    params: GSDParams
-    previous_params: GSDParams
-    count: int
+    logits = jax.vmap(log_prob, (None, None, 0))(theta.psi, theta.rho,
+                                                    jnp.arange(1, 6))
+    return logits
 
-
-@jax.jit
-def fit_mle(data: ArrayLike, max_iterations: int = 100, log_lr_min: ArrayLike = -15, log_lr_max: ArrayLike = 2.,
-            num_lr: ArrayLike = 10) -> tuple[GSDParams, OptState]:
-    """Finds the maximum likelihood estimator of the GSD parameters.
-    The algorithm used here is a simple gradient ascent.
-    We use the concept of projected gradient to enforce constraints for parameters (psi in [1, 5], rho in [0, 1]) and exhaustive search for line search along the gradient.
-
-    :param data: An array of counts for each response.
-    :param max_iterations: Maximum number of iterations.
-    :param log_lr_min: Log2 of the smallest learning rate.
-    :param log_lr_max: Log2 of the largest learning rate.
-    :param num_lr: Number of learning rates to check during the line search.
-
-    :return: An opt state whore params filed contains estimated values of GSD Parameters
-    """
-
-    data = jnp.asarray(data)
-    def ll(theta: GSDParams) -> Array:
-        logits = jax.vmap(log_prob, (None, None, 0), (0))(theta.psi, theta.rho, jnp.arange(1, 6))
-        return jnp.dot(data, logits) / jnp.sum(data)
-
-    grad_ll = jax.grad(ll)
-    theta0 = fit_moments(data)
-    rate = jnp.concatenate([jnp.zeros((1,)), jnp.logspace(log_lr_min, log_lr_max, num_lr, base=2.)])
-
-    def update(tg, t, lo, hi):
-        '''
-        :param tg: gradient
-        :param t: theta parameters
-        :param lo: lower bound
-        :param hi: upper bound
-        :return: updated params
-        '''
-        nt = t + rate * jnp.where(jnp.isnan(tg), 0., tg)
-        _nt = jnp.where(nt < lo, lo, nt)
-        _nt = jnp.where(_nt > hi, hi, _nt)
-        return _nt
-
-    lo = GSDParams(psi=1., rho=0.)
-    hi = GSDParams(psi=5., rho=1.)
-
-    def body_fun(state: OptState) -> OptState:
-        t, _, count = state
-        g = grad_ll(t)
-        new_theta = jtu.tree_map(update, g, t, lo, hi)
-        new_lls = jax.vmap(ll)(new_theta)
-        max_idx = jnp.argmax(jnp.where(jnp.isnan(new_lls), -jnp.inf, new_lls))
-        return OptState(params=jtu.tree_map(lambda t: t[max_idx], new_theta), previous_params=t, count=count + 1)
-
-    def cond_fun(state: OptState) -> bool:
-        tn, tnm1, c = state
-        should_stop = jnp.logical_or(jnp.all(jnp.array(tn) == jnp.array(tnm1)), c > max_iterations)
-        # stop on NaN
-        should_stop = jnp.logical_or(should_stop, jnp.any(jnp.isnan(jnp.array(tn))))
-        return jnp.logical_not(should_stop)
-
-    opt_state = jax.lax.while_loop(cond_fun, body_fun,
-                                   OptState(params=theta0, previous_params=jtu.tree_map(lambda _: jnp.inf, theta0),
-                                            count=0))
-    return opt_state.params, opt_state
 

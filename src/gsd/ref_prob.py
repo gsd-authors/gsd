@@ -38,11 +38,15 @@ def C(ψ):
 
 
 def _prob_k_1(ψ: float, ρ: float) -> float:
-    return (M - ψ) / (M - 1) * 𝚷(((M - ψ) * ρ / (M - 1) + i * (C(ψ) - ρ)) / (ρ + i * (C(ψ) - ρ)) for i in ℤ[1, M - 2])
+    return (M - ψ) / (M - 1) * 𝚷(
+        ((M - ψ) * ρ / (M - 1) + i * (C(ψ) - ρ)) / (ρ + i * (C(ψ) - ρ)) for i
+        in ℤ[1, M - 2])
 
 
 def _prob_k_M(ψ: float, ρ: float) -> float:
-    return (ψ - 1) / (M - 1) * 𝚷(((ψ - 1) * ρ / (M - 1) + i * (C(ψ) - ρ)) / (ρ + i * (C(ψ) - ρ)) for i in ℤ[1, M - 2])
+    return (ψ - 1) / (M - 1) * 𝚷(
+        ((ψ - 1) * ρ / (M - 1) + i * (C(ψ) - ρ)) / (ρ + i * (C(ψ) - ρ)) for i
+        in ℤ[1, M - 2])
 
 
 def _prob_beta_bin_k(ψ, ρ, k):
@@ -66,8 +70,10 @@ def _prob_mix(ψ: float, ρ: float, k: int) -> float:
     if ρ == 1:
         ret = min_var_part
     else:
-        ret = (ρ - C(ψ)) / (1 - C(ψ)) * min_var_part + (1 - ρ) / (1 - C(ψ)) * comb(M - 1, k - 1) * (
-                (ψ - 1) / (M - 1)) ** (k - 1) * ((M - ψ) / (M - 1)) ** (M - k)
+        ret = (ρ - C(ψ)) / (1 - C(ψ)) * min_var_part + (1 - ρ) / (
+                    1 - C(ψ)) * comb(M - 1, k - 1) * (
+                      (ψ - 1) / (M - 1)) ** (k - 1) * ((M - ψ) / (M - 1)) ** (
+                          M - k)
     return ret
 
 

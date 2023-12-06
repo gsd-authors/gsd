@@ -45,6 +45,29 @@ class AutogradTestCase(unittest.TestCase):
 
         self.assertTrue(h[0])
         self.assertFalse(any(tree.tree_leaves(x)))
+    def test_log_prob_grad(self):
+        for psi in [1., 1.1, 2., 3., 4., 5.]:
+            for rho in [0.0, 0.5, 0.8, 1.]:
+                for k in range(1, 6):
+                    pref = gsd.gsd_prob(psi, rho, k)
+                    @jax.grad
+                    def g(theta:tuple, k):
+                        psi, rho = theta
+                        return gsd.log_prob(psi, rho, k)
+
+                    dldt = g((psi,rho), k)
+                    h=1e-9
+                    # dldp = (log(gsd.gsd_prob(psi+h, rho,k))-log(gsd.gsd_prob(psi, rho,k)))/h
+                    # dldr = (log(gsd.gsd_prob(psi , rho+h, k)) - log(
+                    #     gsd.gsd_prob(psi, rho, k))) / h
+                    #print(dldt,(dldp, dldr))
+                    for d in dldt:
+                        if np.isnan(d) or np.isinf(d):
+                            print(dict(psi=psi, rho=rho, k=k))
+                            print(dldt)
+
+                    ...
+
 
 class FancyMathTestCase(unittest.TestCase):
     def test_prod(self):

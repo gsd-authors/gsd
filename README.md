@@ -57,7 +57,8 @@ pip install ref_gsd
 
 ```python
 import gsd
-gsd.fit_mle([2,8,2,0,0.])
+
+gsd.fit_moments([2, 8, 2, 0, 0.])
 ```
 
 ## Development

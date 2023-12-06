@@ -19,27 +19,52 @@ Distribution functions implemented in JAX for speed and auto differentiation.
 __Currently, we support only GSD with 5 point scale__
 
 ::: gsd.log_prob 
+
+---
+
 ::: gsd.sample
+
+---
+
 ::: gsd.mean
+
+---
+
 ::: gsd.variance
+
+---
+
 ::: gsd.sufficient_statistic
 
 
 ## Fit
 
-We provide two estimators. 
-The simple one based on moments and the maximum likelihood estimator.
-
-::: gsd.fit_mle
+We provide few estimators. The simple one is based on moments. 
+A more advanced gradient-based estimator maximum likelihood estimator is 
+provided in `gsd.experimental`. We also provide a naive grid search MLE.
+Besides the high-level API one can use optimizers form `scipy` or `tensorflow_probability`.   
 
 ::: gsd.fit_moments
 
-## Structures
+
+### Constrained parameter space
+
+:::gsd.fit.log_pmax
+
+:::gsd.fit.allowed_region
+
+
+
+
+### Structures
 
 
 ::: gsd.fit.GSDParams
 
-::: gsd.fit.OptState
+
+## Experimental
+
+::: gsd.experimental
 
 
 
