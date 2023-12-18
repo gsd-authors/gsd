@@ -393,8 +393,70 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#gsd.experimental" class="md-nav__link">
-    experimental
+  <a href="#gsd.experimental.fit_mle" class="md-nav__link">
+    fit_mle()
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#gsd.experimental.fit_mle_grid" class="md-nav__link">
+    fit_mle_grid()
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#gsd.experimental.g_test" class="md-nav__link">
+    g_test()
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#gsd.experimental.pp_plot_data" class="md-nav__link">
+    pp_plot_data()
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#gsd.experimental.BootstrapResult" class="md-nav__link">
+    BootstrapResult
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#gsd.experimental.GridEstimator" class="md-nav__link">
+    GridEstimator
+  </a>
+  
+    <nav class="md-nav" aria-label="GridEstimator">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#gsd.experimental.GridEstimator.__call__" class="md-nav__link">
+    __call__()
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#gsd.experimental.GridEstimator.make" class="md-nav__link">
+    make()
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#gsd.experimental.OptState" class="md-nav__link">
+    OptState
   </a>
   
 </li>
@@ -1217,18 +1279,732 @@ various statistical and modeling applications.</p>
 </div><h2 id="experimental">Experimental<a class="headerlink" href="#experimental" title="Permanent link">¤</a></h2>
 
 
-<div class="doc doc-object doc-module">
+
+<div class="doc doc-object doc-function">
 
 
 
 
-<h2 id="gsd.experimental" class="doc doc-heading">
-          <code>gsd.experimental</code>
+<h2 id="gsd.experimental.fit_mle" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">gsd</span><span class="o">.</span><span class="n">experimental</span><span class="o">.</span><span class="n">fit_mle</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">max_iterations</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">log_lr_min</span><span class="o">=-</span><span class="mi">15</span><span class="p">,</span> <span class="n">log_lr_max</span><span class="o">=</span><span class="mf">2.0</span><span class="p">,</span> <span class="n">num_lr</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">constrain_by_pmax</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></code>
 
+<a href="#gsd.experimental.fit_mle" class="headerlink" title="Permanent link">¤</a></h2>
 
-<a href="#gsd.experimental" class="headerlink" title="Permanent link">¤</a></h2>
 
   <div class="doc doc-contents first">
+  
+      <p>Finds the maximum likelihood estimator of the GSD parameters. The
+algorithm used here is a simple gradient ascent. We use the concept of
+projected gradient to enforce constraints for parameters (psi in [1, 5],
+rho in [0, 1]) and exhaustive search for line search along the gradient.</p>
+<p><em>Since the mass function is not smooth, a gradient-based estimator can fail</em></p>
+
+
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>data</code></td>
+          <td>
+                <code><span title="jax._src.basearray.ArrayLike">ArrayLike</span></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>An array of counts for each response.</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr>
+          <td><code>max_iterations</code></td>
+          <td>
+                <code>int</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>Maximum number of iterations.</p>
+            </div>
+          </td>
+          <td>
+                <code>100</code>
+          </td>
+        </tr>
+        <tr>
+          <td><code>log_lr_min</code></td>
+          <td>
+                <code><span title="jax._src.basearray.ArrayLike">ArrayLike</span></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>Log2 of the smallest learning rate.</p>
+            </div>
+          </td>
+          <td>
+                <code>-15</code>
+          </td>
+        </tr>
+        <tr>
+          <td><code>log_lr_max</code></td>
+          <td>
+                <code><span title="jax._src.basearray.ArrayLike">ArrayLike</span></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>Log2 of the largest learning rate.</p>
+            </div>
+          </td>
+          <td>
+                <code>2.0</code>
+          </td>
+        </tr>
+        <tr>
+          <td><code>num_lr</code></td>
+          <td>
+                <code><span title="jax._src.basearray.ArrayLike">ArrayLike</span></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>Number of learning rates to check during the line search.</p>
+            </div>
+          </td>
+          <td>
+                <code>10</code>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+
+  <p><strong>Returns:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td>
+                <code>tuple[<a class="autorefs autorefs-internal" title="gsd.GSDParams" href="#gsd.fit.GSDParams">GSDParams</a>, <a class="autorefs autorefs-internal" title="gsd.experimental.fit.OptState" href="#gsd.experimental.OptState">OptState</a>]</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>An opt state whore params filed contains estimated values of GSD Parameters</p>
+            </div>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+
+<h2 id="gsd.experimental.fit_mle_grid" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">gsd</span><span class="o">.</span><span class="n">experimental</span><span class="o">.</span><span class="n">fit_mle_grid</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">num</span><span class="p">,</span> <span class="n">constrain_by_pmax</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></code>
+
+<a href="#gsd.experimental.fit_mle_grid" class="headerlink" title="Permanent link">¤</a></h2>
+
+
+  <div class="doc doc-contents first">
+  
+      <p>Fit GSD using naive grid search method.
+This function uses <code>numpy</code> and cannot be used in <code>jit</code></p>
+<pre><code>&gt;&gt;&gt; data = jnp.asarray([20, 0, 0, 0, 0.0])
+&gt;&gt;&gt; theta = fit_mle_grid(data, GSDParams(32,32),False)
+</code></pre>
+
+
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>data</code></td>
+          <td>
+                <code><span title="jax._src.basearray.ArrayLike">ArrayLike</span></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>An array of counts for each response.</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr>
+          <td><code>num</code></td>
+          <td>
+                <code><a class="autorefs autorefs-internal" title="gsd.GSDParams" href="#gsd.fit.GSDParams">GSDParams</a></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>Number of search for each parameter</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr>
+          <td><code>constrain_by_pmax</code></td>
+          <td>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>Bool flag whether add constrain described in Appendix D</p>
+            </div>
+          </td>
+          <td>
+                <code>False</code>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+
+  <p><strong>Returns:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td>
+                <code><a class="autorefs autorefs-internal" title="gsd.GSDParams" href="#gsd.fit.GSDParams">GSDParams</a></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>Fitted parameters</p>
+            </div>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+
+<h2 id="gsd.experimental.g_test" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">gsd</span><span class="o">.</span><span class="n">experimental</span><span class="o">.</span><span class="n">g_test</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">p</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span> <span class="n">q</span><span class="p">)</span></code>
+
+<a href="#gsd.experimental.g_test" class="headerlink" title="Permanent link">¤</a></h2>
+
+
+  <div class="doc doc-contents first">
+  
+      <p>G-test,"Bogdan: stosujemy bootstrapową wersję (zamiast asymptotycznej ze względu na małe n) klasycznego testu o
+nazwie G-test czyli testu ilorazu wiarygodności."</p>
+
+
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>n</code></td>
+          <td>
+                <code><span title="jax.Array">Array</span></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>Observation counts :math:<code>(n_1, n_2, n_3, n_4, n_5)</code>, a 1d array</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr>
+          <td><code>p</code></td>
+          <td>
+                <code><span title="jax.Array">Array</span></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>Estimated distribution :math:<code>(p_1, p_2, p_3, p_4, p_5)</code>, a 1d array</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr>
+          <td><code>m</code></td>
+          <td>
+                <code><span title="jax.Array">Array</span></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>T Bootstrap samples from distribution :math:<code>p</code>, Array[T,5]</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr>
+          <td><code>q</code></td>
+          <td>
+                <code><span title="jax.Array">Array</span></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>T estimated distributions for bootstrapped samples, array[T,5]</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+
+  <p><strong>Returns:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td>
+                <code><span title="jax.Array">Array</span></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>G-test p-value</p>
+            </div>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+
+<h2 id="gsd.experimental.pp_plot_data" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">gsd</span><span class="o">.</span><span class="n">experimental</span><span class="o">.</span><span class="n">pp_plot_data</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">estimator</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">n_bootstrap_samples</span><span class="p">)</span></code>
+
+<a href="#gsd.experimental.pp_plot_data" class="headerlink" title="Permanent link">¤</a></h2>
+
+
+  <div class="doc doc-contents first">
+
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+
+<h2 id="gsd.experimental.BootstrapResult" class="doc doc-heading">
+          <code>gsd.experimental.BootstrapResult</code>
+
+
+<a href="#gsd.experimental.BootstrapResult" class="headerlink" title="Permanent link">¤</a></h2>
+
+
+  <div class="doc doc-contents first">
+          <p class="doc doc-class-bases">
+            Bases: <code><span title="typing.NamedTuple">NamedTuple</span></code></p>
+
+
+
+  
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+
+  </div>
+
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+
+<h2 id="gsd.experimental.GridEstimator" class="doc doc-heading">
+          <code>gsd.experimental.GridEstimator</code>
+
+
+<a href="#gsd.experimental.GridEstimator" class="headerlink" title="Permanent link">¤</a></h2>
+
+
+  <div class="doc doc-contents first">
+          <p class="doc doc-class-bases">
+            Bases: <code><span title="typing.NamedTuple">NamedTuple</span></code></p>
+
+  
+      <p>Stateful MLE based on grid search</p>
+
+
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>psis</code></td>
+          <td>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>Grid of psi axis</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr>
+          <td><code>rhos</code></td>
+          <td>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>Grid of rho axis</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr>
+          <td><code>lps</code></td>
+          <td>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>Grid of <code>log_prob</code> for each answer and each entry in the axes.</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+  
+
+  <div class="doc doc-children">
+
+
+
+
+
+
+
+
+
+
+<div class="doc doc-object doc-function">
+
+
+
+
+<h3 id="gsd.experimental.GridEstimator.__call__" class="doc doc-heading">
+          <code class="highlight language-python"><span class="fm">__call__</span><span class="p">(</span><span class="n">data</span><span class="p">)</span></code>
+
+<a href="#gsd.experimental.GridEstimator.__call__" class="headerlink" title="Permanent link">¤</a></h3>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Fit GSD using naive grid search method.
+This is a stateful version of <code>fit_mle_grid</code> that supports <code>jax.vmap</code>
+and <code>jax.jit</code>.</p>
+
+
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>data</code></td>
+          <td>
+                <code><span title="jax.Array">Array</span></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>An array of counts for each response.</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+
+  <p><strong>Returns:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td>
+                <code><a class="autorefs autorefs-internal" title="gsd.GSDParams" href="#gsd.fit.GSDParams">GSDParams</a></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>Fitted parameters</p>
+            </div>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+  </div>
+
+</div>
+
+
+<div class="doc doc-object doc-function">
+
+
+
+
+<h3 id="gsd.experimental.GridEstimator.make" class="doc doc-heading">
+          <code class="highlight language-python"><span class="n">make</span><span class="p">(</span><span class="n">num</span><span class="p">)</span></code>
+  
+  <span class="doc doc-labels">
+      <small class="doc doc-label doc-label-staticmethod"><code>staticmethod</code></small>
+  </span>
+
+<a href="#gsd.experimental.GridEstimator.make" class="headerlink" title="Permanent link">¤</a></h3>
+
+
+  <div class="doc doc-contents ">
+  
+      <p>Make a grid estimator for GSD. This estimator precomputed log
+probabilities for each answer on a regular grid.</p>
+
+
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>num</code></td>
+          <td>
+                <code><a class="autorefs autorefs-internal" title="gsd.GSDParams" href="#gsd.fit.GSDParams">GSDParams</a></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>Number of grid points</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+
+  <p><strong>Returns:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td>
+                <code><a class="autorefs autorefs-internal" title="gsd.experimental.fit.GridEstimator" href="#gsd.experimental.GridEstimator">GridEstimator</a></code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>Estimator</p>
+            </div>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+  </div>
+
+</div>
+
+
+
+  </div>
+
+  </div>
+
+</div>
+
+<div class="doc doc-object doc-class">
+
+
+
+
+<h2 id="gsd.experimental.OptState" class="doc doc-heading">
+          <code>gsd.experimental.OptState</code>
+
+
+<a href="#gsd.experimental.OptState" class="headerlink" title="Permanent link">¤</a></h2>
+
+
+  <div class="doc doc-contents first">
+          <p class="doc doc-class-bases">
+            Bases: <code><span title="typing.NamedTuple">NamedTuple</span></code></p>
+
+  
+      <p>A class representing the state of an optimization process.</p>
+<p>Attributes:</p>
+
+
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>(GSDParams)</code></td>
+          <td>
+                <code>params</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>The current optimization parameters.</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+        <tr>
+          <td><code>(int)</code></td>
+          <td>
+                <code>count</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>An integer count indicating the step or iteration of the optimization process.  This class is used to store and manage the state of an optimization algorithm, allowing you to keep track of the current parameters, previous parameters, and the step count.</p>
+            </div>
+          </td>
+          <td>
+              <em>required</em>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
 
   
 
