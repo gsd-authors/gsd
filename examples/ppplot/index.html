@@ -334,6 +334,21 @@
   document.addEventListener('DOMContentLoaded', addWidgetsRenderer);
 }());
 </script>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p><a href="https://colab.research.google.com/github/gsd-authors/gsd/blob/main/examples/ppplot.ipynb" target="_parent"><img alt="Open In Colab" src="https://colab.research.google.com/assets/colab-badge.svg"/></a></p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="highlight"><pre><span></span><code><span class="err">!</span><span class="n">pip</span> <span class="n">install</span> <span class="n">ref_gsd</span>
+</code></pre></div>
+
+</div>
+</div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 
@@ -371,7 +386,7 @@
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 
-<div class="highlight"><pre><span></span><code><span class="n">url</span> <span class="o">=</span> <span class="s2">&quot;https://raw.githubusercontent.com/Netflix/sureal/master/test/resource/NFLX_dataset_public_raw.py&quot;</span>  
+<div class="highlight"><pre><span></span><code><span class="n">url</span> <span class="o">=</span> <span class="s2">&quot;https://raw.githubusercontent.com/Netflix/sureal/master/test/resource/NFLX_dataset_public_raw.py&quot;</span>
 <span class="n">dataset</span> <span class="o">=</span> <span class="p">{}</span>
 <span class="k">try</span><span class="p">:</span>
     <span class="n">response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
@@ -502,7 +517,7 @@
 <div class="cell border-box-sizing text_cell rendered">
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>Let's estimate parameter for all the PVSs. 
+<p>Let's estimate parameter for all the PVSs.
 For this we are going to use <code>jax.lax.map</code>.
  <em>Note, that <code>vmap</code> is nor best here as each estimatio contain control flow instructions.</em></p>
 </div>
@@ -522,7 +537,7 @@ For this we are going to use <code>jax.lax.map</code>.
 <div class="highlight"><pre><span></span><code><span class="n">num</span> <span class="o">=</span> <span class="n">GSDParams</span><span class="p">(</span><span class="mi">512</span><span class="p">,</span> <span class="mi">128</span><span class="p">)</span>
 <span class="n">grid</span> <span class="o">=</span> <span class="n">GridEstimator</span><span class="o">.</span><span class="n">make</span><span class="p">(</span><span class="n">num</span><span class="p">)</span>
 
-<span class="n">n</span> <span class="o">=</span> <span class="mi">40</span>
+
 <span class="n">n</span> <span class="o">=</span> <span class="mi">3</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">counts</span><span class="p">[</span><span class="n">n</span><span class="p">])</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">jax</span><span class="o">.</span><span class="n">tree_util</span><span class="o">.</span><span class="n">tree_map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="n">n</span><span class="p">],</span> <span class="n">fits</span><span class="p">))</span>
