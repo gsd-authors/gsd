@@ -1,5 +1,5 @@
 from functools import partial
-from typing import NamedTuple
+from typing import NamedTuple, Callable
 
 import jax
 import numpy as np
@@ -8,6 +8,8 @@ from jax._src.basearray import ArrayLike
 
 from gsd import GSDParams, fit_moments
 from gsd.fit import make_logits, allowed_region
+
+Estimator = Callable[[Array], GSDParams]
 
 
 class OptState(NamedTuple):
@@ -85,7 +87,7 @@ def fit_mle(data: ArrayLike, max_iterations: int = 100,
     def body_fun(state: OptState) -> OptState:
         t, _, count = state
         g = grad_ll(t)
-        jax.debug.print("grad {0} {1}", *g)
+        # jax.debug.print("grad {0} {1}", *g)
         new_theta = jtu.tree_map(update, g, t, lo, hi)
         new_lls = jax.vmap(ll)(new_theta)
         # filter nan
@@ -106,11 +108,12 @@ def fit_mle(data: ArrayLike, max_iterations: int = 100,
                                      jnp.any(jnp.isnan(jnp.array(tn))))
         return jnp.logical_not(should_stop)
 
-    opt_state = jax.lax.while_loop(cond_fun, body_fun,
-                                   OptState(params=theta0,
-                                            previous_params=jtu.tree_map(
-                                                lambda _: jnp.inf, theta0),
-                                            count=0, ), )
+    opt_state = jax.lax.while_loop(cond_fun, body_fun, OptState(params=theta0,
+                                                                previous_params=jtu.tree_map(
+                                                                    lambda
+                                                                        _: jnp.inf,
+                                                                    theta0),
+                                                                count=0, ), )
     return opt_state.params, opt_state
 
 
@@ -144,10 +147,12 @@ def fit_mle_grid(data: ArrayLike, num: GSDParams,
     grid_exes = jtu.tree_map(jnp.linspace, lo, hi, num)
 
     def ll(psi, rho) -> Array:
-        return jnp.dot(jnp.asarray(data), make_logits(GSDParams(psi=psi, rho=rho)))
+        ll = jnp.asarray(data) * make_logits(GSDParams(psi=psi, rho=rho))
+        ll = jnp.where(jnp.isnan(ll), 0., ll)
+        return jnp.sum(ll)
 
     grid_ll = jax.vmap(ll, in_axes=(0, None))
-    grid_ll = jax.vmap(grid_ll, in_axes=(None, 0))
+    grid_ll = jax.vmap(grid_ll, in_axes=(None, 0), out_axes=1)
     grid_ll = jax.jit(grid_ll)
 
     lls = grid_ll(grid_exes.psi, grid_exes.rho)
@@ -160,4 +165,51 @@ def fit_mle_grid(data: ArrayLike, num: GSDParams,
         i, j = np.where(tv)
 
     k = np.argmax(lls[i, j])
-    return GSDParams(psi=grid_exes.psi[j[k]], rho=grid_exes.rho[i[k]])
+    return GSDParams(psi=grid_exes.psi[i[k]], rho=grid_exes.rho[j[k]])
+
+
+class GridEstimator(NamedTuple):
+    psis: Array
+    rhos: Array
+    lps: Array
+
+    @staticmethod
+    def make(num: GSDParams):
+        """Make a grid estimator for GSD. This estimator precomputed log
+        probabilities for each answer on a regular grid.
+
+        :param num: Number of grid points
+
+        :return: Estimator
+        """
+        lo = GSDParams(psi=1., rho=0.)
+        hi = GSDParams(psi=5., rho=1.)
+
+        grid_exes = jtu.tree_map(jnp.linspace, lo, hi, num)
+
+        @jax.jit
+        @partial(jax.vmap, in_axes=(0, None))
+        @partial(jax.vmap, in_axes=(None, 0))
+        def _make_logis(psi, rho):
+            logits = make_logits(GSDParams(psi, rho))
+            small = -1e12
+            logits = jnp.where(logits < small, small, logits)
+            return logits  # ,psi,rho
+
+        return GridEstimator(psis=grid_exes.psi, rhos=grid_exes.rho,
+            lps=_make_logis(grid_exes.psi, grid_exes.rho))
+
+    @jax.jit
+    def __call__(self, data: Array) -> GSDParams:
+        """Fit GSD using naive grid search method.
+        This is a stateful version of ``fit_mle_grid`` that supports `jax.vmap`
+        and `jax.jit`.
+
+        :param data: An array of counts for each response.
+        :return: Fitted parameters
+        """
+        map = self.lps @ data
+        flat_idx = jnp.argmax(map)
+        i, j = jnp.unravel_index(flat_idx, map.shape)
+        hat = GSDParams(psi=self.psis[i], rho=self.rhos[j])
+        return hat

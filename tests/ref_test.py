@@ -12,13 +12,14 @@ import jax.numpy as jnp
 
 class JaxGSDTestCase(unittest.TestCase):
 
-    def test_something(self):
+    def test_pmf(self):
         for psi in [1., 1.1, 2., 3., 4., 5.]:
             for rho in [0.0, 0.5,0.8, 1.]:
                 for k in range(1, 6):
                     pref = gsd.gsd_prob(psi, rho, k)
                     lpjax = gsd.log_prob(psi, rho, k)
                     print(psi,rho,k, pref,exp(lpjax))
+                    self.assertFalse(np.isnan(lpjax))
                     self.assertAlmostEqual(pref,exp(lpjax))
                     ...
 
