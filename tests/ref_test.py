@@ -97,6 +97,12 @@ class SufficientStatistic(unittest.TestCase):
         #                                          1, 2  3  4  5
         self.assertTrue(np.allclose(ss,np.asarray([1, 0, 0, 0, 0])))
 
+    def test_sufficient_statistic4(self):
+        c = [0,0,1,10,13]
+        data = sum([int(n) * [i + 1, ] for i, n in enumerate(c)], [])
+        ss = gsd.sufficient_statistic(data)
+        #                                          1, 2  3  4  5
+        self.assertTrue(np.allclose(ss,c))
 
 if __name__ == '__main__':
     unittest.main()

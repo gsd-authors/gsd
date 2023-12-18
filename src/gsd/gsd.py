@@ -136,6 +136,6 @@ def sufficient_statistic(data: ArrayLike) -> Array:
     :param data: Samples from GSD data[i] in [1..5]
     :return: Counts of each possible value
     """
-    data = jnp.asarray(data)
-    _, cu = jnp.unique(data, return_counts=True, size=N)
-    return cu
+    bins = jnp.arange(0.5, N + 1.5, 1.)
+    c, _ = jnp.histogram(jnp.asarray(data), bins=bins)
+    return c
