@@ -64,9 +64,19 @@ Besides the high-level API one can use optimizers form `scipy` or `tensorflow_pr
 
 ## Experimental
 
-::: gsd.experimental
+::: gsd.experimental.fit_mle
 
+::: gsd.experimental.fit_mle_grid
 
+::: gsd.experimental.g_test
+
+::: gsd.experimental.pp_plot_data
+
+::: gsd.experimental.BootstrapResult
+
+::: gsd.experimental.GridEstimator
+
+::: gsd.experimental.OptState
 
 
 
