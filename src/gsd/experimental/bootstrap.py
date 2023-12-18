@@ -1,3 +1,4 @@
+from functools import partial
 from typing import NamedTuple
 
 import jax
@@ -56,6 +57,11 @@ def g_test(n: Array, p: Array, m: Array, q: Array) -> Array:
 
 
 def prob(x: GSDParams) -> Array:
+    """Compute probabilities of each answer.
+
+    :param x: Parametrs of GSD
+    :return: An array of probabilities
+    """
     return jnp.exp(jax.vmap(log_prob, in_axes=(None, None, 0))(x.psi, x.rho,
                                                                jnp.arange(1,
                                                                           6)))
@@ -67,7 +73,7 @@ class BootstrapResult(NamedTuple):
     bootstrap_probs: Array
 
 
-# @partial(jax.jit, static_argnums=(3, 4))
+@partial(jax.jit, static_argnums=(1, 3, 4))
 def static_bootstrap(data: ArrayLike, estimator: Estimator, key: Array,
                       n_bootstrap_samples: int,
                       n_total_scores: int) -> BootstrapResult:

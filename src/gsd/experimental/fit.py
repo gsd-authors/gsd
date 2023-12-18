@@ -169,12 +169,18 @@ def fit_mle_grid(data: ArrayLike, num: GSDParams,
 
 
 class GridEstimator(NamedTuple):
+    """ Stateful MLE based on grid search
+
+    :param psis: Grid of psi axis
+    :param rhos: Grid of rho axis
+    :param lps: Grid of `log_prob` for each answer and each entry in the axes.
+    """
     psis: Array
     rhos: Array
     lps: Array
 
     @staticmethod
-    def make(num: GSDParams):
+    def make(num: GSDParams)->"GridEstimator":
         """Make a grid estimator for GSD. This estimator precomputed log
         probabilities for each answer on a regular grid.
 

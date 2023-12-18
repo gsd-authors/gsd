@@ -1,10 +1,14 @@
-import unittest
+from jax import config
+config.update("jax_enable_x64", True)
+
+import unittest  # noqa: E402
 
 import jax
 import jax.numpy as jnp
 import numpy as np
 
-from gsd.experimental import fit_mle_grid
+import gsd
+from gsd.experimental import fit_mle_grid, bootstrap
 from gsd.experimental.bootstrap import pp_plot_data
 from gsd.experimental.fit import GridEstimator
 from gsd.fit import log_pmax, pairs, pmax, GSDParams, fit_moments
@@ -57,3 +61,42 @@ class PPTestCase(unittest.TestCase):
         data = jnp.asarray([10, 5, 1, 0, 0.0])
         n = int(np.sum(data))
         p_val = pp_plot_data(data, fit_moments, jax.random.key(42), 99)
+
+
+class BootstrapTestCase(unittest.TestCase):
+    def test_sample_fit(self):
+        k = jax.random.key(12)
+        th = GSDParams(psi=4.2, rho=.92)
+        th = jax.tree_util.tree_map(jnp.asarray, th)
+        s = gsd.sample(th.psi, th.rho, (100000,),k)
+        data = gsd.sufficient_statistic(s)
+        num = GSDParams(512, 128)
+        grid = GridEstimator.make(num)
+        hat = grid(data)
+        self.assertAlmostEqual(hat.psi, th.psi, 2)
+        self.assertAlmostEqual(hat.rho, th.rho, 2)
+        ...
+
+    def test_g_test(self):
+        # https://github.com/Qub3k/gsd-acm-mm/blob/master/Data_Analysis/G-test_results/G_test_on_real_data_chunk000_of_872.csv
+        data = jnp.asarray([0,0,1,10,13.])
+        num = GSDParams(512, 128)
+        grid = GridEstimator.make(num)
+
+
+        hat = grid(data)
+        self.assertTrue(np.allclose(hat.psi, 4.5, 0.001))
+        self.assertTrue(np.allclose(hat.rho, 0.935, 0.01))
+
+        p = bootstrap.prob(hat)
+        # 0.09459716927725387
+        t = bootstrap.t_statistic(data,p)
+        self.assertAlmostEqual(t,0.09459716927725387,2)
+
+        # 0.4957
+        pv = bootstrap.pp_plot_data(data,lambda x: grid(x) ,jax.random.key(44),9999)
+
+        self.assertAlmostEqual(pv,0.4957,1)
+
+
+        ...
