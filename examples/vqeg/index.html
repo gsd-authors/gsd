@@ -368,7 +368,7 @@
 <div class="cell border-box-sizing text_cell rendered">
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p><a href="https://colab.research.google.com/github/gsd-authors/gsd/blob/main/examples/ppplot.ipynb" target="_parent"><img alt="Open In Colab" src="https://colab.research.google.com/assets/colab-badge.svg"/></a></p>
+<p><a href="https://colab.research.google.com/github/gsd-authors/gsd/blob/main/examples/vqeg.ipynb" target="_parent"><img alt="Open In Colab" src="https://colab.research.google.com/assets/colab-badge.svg"/></a></p>
 </div>
 </div>
 </div>
@@ -383,7 +383,8 @@
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 
-<div class="highlight"><pre><span></span><code><span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">partial</span>
+<div class="highlight"><pre><span></span><code><span class="c1"># @title Imports</span>
+<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">partial</span>
 
 <span class="kn">import</span> <span class="nn">gsd</span>
 <span class="kn">import</span> <span class="nn">gsd.experimental</span> <span class="k">as</span> <span class="nn">gsde</span>
@@ -410,9 +411,9 @@
 <div class="cell border-box-sizing text_cell rendered">
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>title: Reference implementation of generalised score distribution in python VQEG meeting
-author: Krzysztof Rusek, Lucjan Janowski
-date: 19-12-2023</p>
+<p>title: Reference implementation of generalised score distribution in python VQEG meeting</p>
+<p>author: Krzysztof Rusek, Lucjan Janowski</p>
+<p>date: 19-12-2023</p>
 <h1 id="what-is-generalised-score-distribution-gsd">What is Generalised Score Distribution (GSD) ?<a class="headerlink" href="#what-is-generalised-score-distribution-gsd" title="Permanent link">¤</a></h1>
 <ul>
 <li>A discrete distribution supported on <span class="arithmatex">\(\{1,\ldots,M\}\)</span> covering all possible variances</li>
@@ -427,7 +428,7 @@ date: 19-12-2023</p>
 <h2 id="httpsgithubcomgsd-authorsgsd">https://github.com/gsd-authors/gsd<a class="headerlink" href="#httpsgithubcomgsd-authorsgsd" title="Permanent link">¤</a></h2>
 <ul>
 <li>Probability mass function of GSD</li>
-<li>Efficient <code>log_prob</code> and <code>sample</code> in JAX </li>
+<li>Efficient <code>log_prob</code> and <code>sample</code> in JAX</li>
 <li>Additional utilities (MLE, ppplot,...)</li>
 </ul>
 <p>For  <span class="arithmatex">\(O\sim\mathcal{GSD}(\psi,\rho)\)</span>, we provide</p>
@@ -440,7 +441,7 @@ date: 19-12-2023</p>
 <p><strong>For efficiency</strong> (GPU, jit and autograd),only <span class="arithmatex">\(M=5\)</span></p>
 <ul>
 <li><code>log_prob(psi,rho,k)</code> (<span class="arithmatex">\(\log \mathbb{P}(O=k)\)</span>)</li>
-<li><code>sample</code> </li>
+<li><code>sample</code></li>
 <li><code>mean</code></li>
 <li><code>variance</code></li>
 <li><code>fit*</code></li>
@@ -542,7 +543,8 @@ date: 19-12-2023</p>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 
-<div class="highlight"><pre><span></span><code><span class="n">theta0</span> <span class="o">=</span> <span class="n">GSDParams</span><span class="p">(</span><span class="n">psi</span><span class="o">=</span><span class="mf">2.0</span><span class="p">,</span> <span class="n">rho</span><span class="o">=</span><span class="mf">0.9</span><span class="p">)</span>
+<div class="highlight"><pre><span></span><code><span class="c1"># @title Nelder Mead from tfp</span>
+<span class="n">theta0</span> <span class="o">=</span> <span class="n">GSDParams</span><span class="p">(</span><span class="n">psi</span><span class="o">=</span><span class="mf">2.0</span><span class="p">,</span> <span class="n">rho</span><span class="o">=</span><span class="mf">0.9</span><span class="p">)</span>
 <span class="n">x0</span><span class="p">,</span> <span class="n">unravel_fn</span> <span class="o">=</span> <span class="n">ravel_pytree</span><span class="p">(</span><span class="n">theta0</span><span class="p">)</span>
 
 
@@ -752,7 +754,7 @@ For this we are going to use <code>jax.lax.map</code>.
 
 <div class="highlight"><pre><span></span><code><span class="n">n_b</span><span class="o">=</span><span class="mi">99</span>
 <span class="n">key</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">key</span><span class="p">(</span><span class="mi">42</span><span class="p">)</span>
-<span class="n">keys</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">counts</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<span class="n">keys</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">acrscores</span><span class="p">))</span>
 
 <span class="n">pvals</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span>
     <span class="p">[</span>
@@ -768,14 +770,6 @@ For this we are going to use <code>jax.lax.map</code>.
 <div class="input">
 
 <div class="highlight"><pre><span></span><code><span class="n">pp_plot</span><span class="p">(</span><span class="n">pvals</span><span class="p">)</span>
-</code></pre></div>
-
-</div>
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-
-<div class="highlight"><pre><span></span><code>
 </code></pre></div>
 
 </div>
