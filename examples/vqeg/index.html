@@ -11,6 +11,8 @@
       
       
       
+        <link rel="prev" href="../scipy/">
+      
       
       
       <link rel="icon" href="../../assets/images/favicon.png">
@@ -18,7 +20,7 @@
     
     
       
-        <title>Ppplot - GSD</title>
+        <title>VQEG - GSD</title>
       
     
     
@@ -73,7 +75,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#pp-plot" class="md-skip">
+        <a href="#what-is-generalised-score-distribution-gsd" class="md-skip">
           Skip to content
         </a>
       
@@ -109,7 +111,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Ppplot
+              VQEG
             
           </span>
         </div>
@@ -289,6 +291,35 @@
   
 
     
+      
+      
+  
+  
+    
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  <span class="md-ellipsis">
+    VQEG
+  </span>
+  
+
+      </a>
+      
+    </li>
+  
+
+    
   </ul>
 </nav>
                   </div>
@@ -368,12 +399,76 @@
 <span class="kn">from</span> <span class="nn">jax</span> <span class="kn">import</span> <span class="n">Array</span>
 <span class="kn">from</span> <span class="nn">jax.flatten_util</span> <span class="kn">import</span> <span class="n">ravel_pytree</span>
 <span class="kn">from</span> <span class="nn">jax.typing</span> <span class="kn">import</span> <span class="n">ArrayLike</span>
-
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 
 <span class="n">tfd</span> <span class="o">=</span> <span class="n">tfp</span><span class="o">.</span><span class="n">distributions</span>
 <span class="n">tfb</span> <span class="o">=</span> <span class="n">tfp</span><span class="o">.</span><span class="n">bijectors</span>
 </code></pre></div>
 
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>title: Reference implementation of generalised score distribution in python VQEG meeting
+author: Krzysztof Rusek, Lucjan Janowski
+date: 19-12-2023</p>
+<h1 id="what-is-generalised-score-distribution-gsd">What is Generalised Score Distribution (GSD) ?<a class="headerlink" href="#what-is-generalised-score-distribution-gsd" title="Permanent link">¤</a></h1>
+<ul>
+<li>A discrete distribution supported on <span class="arithmatex">\(\{1,\ldots,M\}\)</span> covering all possible variances</li>
+<li>Parameterized by its expectation value (<span class="arithmatex">\(\psi\)</span>)</li>
+<li>And shape parameter (<span class="arithmatex">\(\rho\)</span>)</li>
+<li>Variance is a linear function of <span class="arithmatex">\(\rho\)</span></li>
+<li><span class="arithmatex">\(\rho=1=&gt;\)</span> minimal variance (<span class="arithmatex">\([0,0,1,0,0]\)</span>, <span class="arithmatex">\([0.25,0.75,0,0,0]\)</span>)</li>
+<li><span class="arithmatex">\(\rho=0=&gt;\)</span> maximal variance (<span class="arithmatex">\([0.5,0,0,0,0.5]\)</span>, <span class="arithmatex">\([13/16, 0, 0, 0, 3/16]\)</span>)</li>
+<li><em>Inductive bias for subjective experiments</em></li>
+</ul>
+<h1 id="ref_gsd-package"><code>ref_gsd</code> package<a class="headerlink" href="#ref_gsd-package" title="Permanent link">¤</a></h1>
+<h2 id="httpsgithubcomgsd-authorsgsd">https://github.com/gsd-authors/gsd<a class="headerlink" href="#httpsgithubcomgsd-authorsgsd" title="Permanent link">¤</a></h2>
+<ul>
+<li>Probability mass function of GSD</li>
+<li>Efficient <code>log_prob</code> and <code>sample</code> in JAX </li>
+<li>Additional utilities (MLE, ppplot,...)</li>
+</ul>
+<p>For  <span class="arithmatex">\(O\sim\mathcal{GSD}(\psi,\rho)\)</span>, we provide</p>
+<h1 id="pmf">PMF<a class="headerlink" href="#pmf" title="Permanent link">¤</a></h1>
+<div class="arithmatex">\[\mathbb{P}(O=k)\]</div>
+<div class="highlight"><pre><span></span><code>gsd_prob(ψ: float, ρ: float, k: int)-&amp;gt;float
+</code></pre></div>
+<p><strong>Pure Python, focused on correctness</strong></p>
+<h1 id="jax">JAX<a class="headerlink" href="#jax" title="Permanent link">¤</a></h1>
+<p><strong>For efficiency</strong> (GPU, jit and autograd),only <span class="arithmatex">\(M=5\)</span></p>
+<ul>
+<li><code>log_prob(psi,rho,k)</code> (<span class="arithmatex">\(\log \mathbb{P}(O=k)\)</span>)</li>
+<li><code>sample</code> </li>
+<li><code>mean</code></li>
+<li><code>variance</code></li>
+<li><code>fit*</code></li>
+<li>...</li>
+<li>Full API doc <a href="https://gsd-authors.github.io/gsd/">https://gsd-authors.github.io/gsd/</a></li>
+</ul>
+<h1 id="gsdexperimental"><code>gsd.experimental</code><a class="headerlink" href="#gsdexperimental" title="Permanent link">¤</a></h1>
+<p>Some useful tools that</p>
+<ul>
+<li>Is not a simple function</li>
+<li>or should be moved to another repo</li>
+<li>or need to be polished</li>
+</ul>
+<h1 id="demo">Demo<a class="headerlink" href="#demo" title="Permanent link">¤</a></h1>
+<p>You can use this software to:</p>
+<ul>
+<li>Estimate parameters</li>
+<li>Compare experiments</li>
+<li>Check consistency</li>
+</ul>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h1 id="estimate-parameters">Estimate parameters<a class="headerlink" href="#estimate-parameters" title="Permanent link">¤</a></h1>
+</div>
 </div>
 </div>
 <div class="cell border-box-sizing text_cell rendered">
@@ -407,36 +502,6 @@
 <div class="highlight"><pre><span></span><code><span class="n">o</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">([</span><span class="n">v</span><span class="p">[</span><span class="s2">&quot;os&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;dis_videos&quot;</span><span class="p">]])</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">o</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
 <span class="n">counts</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">vmap</span><span class="p">(</span><span class="n">gsd</span><span class="o">.</span><span class="n">sufficient_statistic</span><span class="p">)(</span><span class="n">o</span><span class="p">)</span>
-</code></pre></div>
-
-</div>
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-
-<div class="highlight"><pre><span></span><code><span class="n">hdtv</span> <span class="o">=</span> <span class="kc">False</span>
-<span class="c1">#hdtv = True</span>
-</code></pre></div>
-
-</div>
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-
-<div class="highlight"><pre><span></span><code><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
-
-<span class="k">if</span> <span class="n">hdtv</span><span class="p">:</span>
-    <span class="n">hdtv</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span>
-        <span class="s2">&quot;/Users/krzysiek/Documents/lts_analysis_soft/pyits/log/hdtv_data.csv&quot;</span>
-    <span class="p">)</span>
-    <span class="n">exp1</span> <span class="o">=</span> <span class="n">hdtv</span><span class="p">[</span><span class="n">hdtv</span><span class="o">.</span><span class="n">Experiment</span> <span class="o">==</span> <span class="mi">1</span><span class="p">]</span>
-    <span class="n">exp1</span>
-    <span class="n">n_sub</span> <span class="o">=</span> <span class="mi">24</span>
-    <span class="n">n_pvs</span> <span class="o">=</span> <span class="mi">168</span>
-    <span class="n">o</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">n_pvs</span><span class="p">,</span> <span class="n">n_sub</span><span class="p">))</span>
-    <span class="n">o</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">pivot</span><span class="p">(</span><span class="n">exp1</span><span class="p">,</span> <span class="n">columns</span><span class="o">=</span><span class="s2">&quot;Tester_id&quot;</span><span class="p">,</span> <span class="n">values</span><span class="o">=</span><span class="s2">&quot;Score&quot;</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="s2">&quot;PVS_id&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span>
-
-    <span class="n">counts</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">vmap</span><span class="p">(</span><span class="n">gsd</span><span class="o">.</span><span class="n">sufficient_statistic</span><span class="p">)(</span><span class="n">o</span><span class="p">)</span>
 </code></pre></div>
 
 </div>
@@ -552,7 +617,57 @@ For this we are going to use <code>jax.lax.map</code>.
 <div class="cell border-box-sizing text_cell rendered">
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h1 id="pp-plot">PP-plot<a class="headerlink" href="#pp-plot" title="Permanent link">¤</a></h1>
+<h1 id="compare-experiments">Compare experiments<a class="headerlink" href="#compare-experiments" title="Permanent link">¤</a></h1>
+<p>Lets compare thsi experiment to <code>HDTV</code></p>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="get-estimates-for-hdtv">Get estimates for HDTV<a class="headerlink" href="#get-estimates-for-hdtv" title="Permanent link">¤</a></h2>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="highlight"><pre><span></span><code><span class="n">hdtvfits</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;https://docs.google.com/spreadsheets/d/e/2PACX-1vQ0TpGW07IrLhKkKAQvK5jsKlmghopKB5gIaY-Fd4NVBXjbyXAyffIavJxVFvMacILI8KexFLEW3dCL/pub?gid=824583765&amp;amp;single=true&amp;amp;output=csv&#39;</span><span class="p">)</span>
+<span class="n">hdtvfits</span>
+</code></pre></div>
+
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="highlight"><pre><span></span><code><span class="n">myfits</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">jit</span><span class="p">(</span><span class="n">jax</span><span class="o">.</span><span class="n">vmap</span><span class="p">(</span><span class="n">grid</span><span class="p">))(</span><span class="n">counts</span><span class="p">)</span>
+<span class="n">myfits</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">tree_util</span><span class="o">.</span><span class="n">tree_map</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">,</span> <span class="n">myfits</span><span class="p">)</span>
+</code></pre></div>
+
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="highlight"><pre><span></span><code><span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">set</span><span class="p">()</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+
+<span class="n">sns</span><span class="o">.</span><span class="n">displot</span><span class="p">(</span><span class="n">data</span><span class="o">=</span><span class="n">hdtvfits</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s1">&#39;psi&#39;</span><span class="p">,</span><span class="n">y</span><span class="o">=</span><span class="s1">&#39;rho&#39;</span><span class="p">,</span> <span class="n">kind</span><span class="o">=</span><span class="s1">&#39;kde&#39;</span><span class="p">)</span>
+<span class="n">sns</span><span class="o">.</span><span class="n">scatterplot</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="n">myfits</span><span class="o">.</span><span class="n">psi</span><span class="p">,</span><span class="n">y</span><span class="o">=</span><span class="n">myfits</span><span class="o">.</span><span class="n">rho</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">([</span><span class="s1">&#39;its&#39;</span><span class="p">])</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;density of GSD parameters&quot;</span><span class="p">)</span>
+</code></pre></div>
+
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h1 id="check-consistency">Check consistency<a class="headerlink" href="#check-consistency" title="Permanent link">¤</a></h1>
+<h2 id="pp-plot">PP-plot<a class="headerlink" href="#pp-plot" title="Permanent link">¤</a></h2>
+<p>Let's apply methodology from <code>Nawala, Jakub, et al. "Describing Subjective Experiment Consistency by p-Value P--P Plot." Proceedings of the 28th ACM International Conference on Multimedia. 2020.</code></p>
 </div>
 </div>
 </div>
@@ -567,7 +682,7 @@ For this we are going to use <code>jax.lax.map</code>.
 <span class="k">def</span> <span class="nf">estimator</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
     <span class="k">return</span> <span class="n">grid</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
 
-<span class="n">n_b</span><span class="o">=</span><span class="mi">999</span>
+<span class="n">n_b</span><span class="o">=</span><span class="mi">99</span>
 
 <span class="n">pvals</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span>
     <span class="p">[</span>
@@ -612,6 +727,55 @@ For this we are going to use <code>jax.lax.map</code>.
 
 
 <span class="n">pp_plot</span><span class="p">(</span><span class="n">pvals</span><span class="p">)</span>
+</code></pre></div>
+
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="larger-experiment">Larger experiment<a class="headerlink" href="#larger-experiment" title="Permanent link">¤</a></h2>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="highlight"><pre><span></span><code><span class="n">all_tidy</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">&#39;https://docs.google.com/spreadsheets/d/e/2PACX-1vS8k8EkOW5heGWnmx7rsJjVW-PCUDsTGNOwckOkAEtGvrKaf6yk0bBFTngqCJQstdh0RLOAY1HwBf2S/pub?gid=544207226&amp;amp;single=true&amp;amp;output=csv&#39;</span><span class="p">)</span>
+<span class="n">acrscores</span> <span class="o">=</span> <span class="n">all_tidy</span><span class="p">[</span><span class="n">all_tidy</span><span class="o">.</span><span class="n">scale</span><span class="o">==</span><span class="s2">&quot;ACR&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">groupby</span><span class="p">([</span><span class="s1">&#39;lab&#39;</span><span class="p">,</span><span class="s1">&#39;PVS&#39;</span><span class="p">])[</span><span class="s1">&#39;score&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span>
+</code></pre></div>
+
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="highlight"><pre><span></span><code><span class="n">n_b</span><span class="o">=</span><span class="mi">99</span>
+<span class="n">key</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">key</span><span class="p">(</span><span class="mi">42</span><span class="p">)</span>
+<span class="n">keys</span> <span class="o">=</span> <span class="n">jax</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">counts</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+<span class="n">pvals</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span>
+    <span class="p">[</span>
+        <span class="n">pp_plot_data</span><span class="p">(</span><span class="n">gsd</span><span class="o">.</span><span class="n">sufficient_statistic</span><span class="p">(</span><span class="n">c</span><span class="p">),</span> <span class="n">estimator</span><span class="o">=</span><span class="n">estimator</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">key</span><span class="p">,</span> <span class="n">n_bootstrap_samples</span><span class="o">=</span><span class="n">n_b</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">c</span><span class="p">,</span> <span class="n">key</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">acrscores</span><span class="p">,</span> <span class="n">keys</span><span class="p">)</span>
+    <span class="p">]</span>
+<span class="p">)</span>
+</code></pre></div>
+
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="highlight"><pre><span></span><code><span class="n">pp_plot</span><span class="p">(</span><span class="n">pvals</span><span class="p">)</span>
+</code></pre></div>
+
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+
+<div class="highlight"><pre><span></span><code>
 </code></pre></div>
 
 </div>
