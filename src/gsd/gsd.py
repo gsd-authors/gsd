@@ -19,7 +19,8 @@ def logbinom(n: ArrayLike, k: ArrayLike) -> Array:
 
 
 def vmin(psi: ArrayLike) -> Array:
-    """Compute the minimal possible variance for give mean
+    """Compute the minimal possible variance for categorical distribution
+    supported on Z[1,N] for a give mean
 
     :param psi: mean
     :return: variance
@@ -28,12 +29,13 @@ def vmin(psi: ArrayLike) -> Array:
 
 
 def vmax(psi: ArrayLike) -> Array:
-    """Compute the maximal possible variance for give mean
+    """Compute the maximal possible variance for categorical distribution
+    supported on Z[1,N] for give mean
 
     :param psi: mean
     :return: variance
     """
-    return (psi - 1.0) * (5 - psi)
+    return (psi - 1.0) * (N - psi)
 
 
 def _C(Vmax: ArrayLike, Vmin: ArrayLike) -> Array:
