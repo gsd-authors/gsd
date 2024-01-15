@@ -78,6 +78,24 @@ Besides the high-level API one can use optimizers form `scipy` or `tensorflow_pr
 
 ::: gsd.experimental.OptState
 
+### Maximum entropy
+
+GSD distribution can be considered as the whole family of distributions
+with the following properties:
+
+1. Its distribution over $[1,N]$
+2. The first parameter represents expectation value
+3. It covers all possible variances
+
+Another distribution that has similar properties and can be considered a member 
+of GSD family is maximum entropy distribution.
+
+::: gsd.experimental.MaxEntropyGSD
+    :docstring:
+    :members: __init__
+        
+
+
 
 
 
