@@ -48,6 +48,11 @@ include = [
 [tool.hatch.envs.default]
 dependencies=["jaxlib>=0.4.6"]
 
+[project.optional-dependencies]
+experimental = [
+  "optimistix>=0.0.6",
+]
+
 [tool.hatch.envs.default.scripts]
 test = "python -m unittest discover -p '*test.py'"
 

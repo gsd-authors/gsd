@@ -1,6 +1,7 @@
 from jax import config
-config.update("jax_enable_x64", True)
 
+config.update("jax_enable_x64", True)
+from gsd.experimental.max_entropy import MaxEntropyGSD
 import unittest  # noqa: E402
 
 import jax
@@ -45,7 +46,8 @@ class FitTestCase(unittest.TestCase):
         data = jnp.asarray([7, 25., 0, 0, 0])
         hat = est(data)
         theta = fit_mle_grid(data, num, False)
-        jax.tree_util.tree_map(lambda a,b: self.assertAlmostEqual(a,b,2), hat, theta)
+        jax.tree_util.tree_map(lambda a, b: self.assertAlmostEqual(a, b, 2),
+                               hat, theta)
 
         ...
 
@@ -68,7 +70,7 @@ class BootstrapTestCase(unittest.TestCase):
         k = jax.random.key(12)
         th = GSDParams(psi=4.2, rho=.92)
         th = jax.tree_util.tree_map(jnp.asarray, th)
-        s = gsd.sample(th.psi, th.rho, (100000,),k)
+        s = gsd.sample(th.psi, th.rho, (100000,), k)
         data = gsd.sufficient_statistic(s)
         num = GSDParams(512, 128)
         grid = GridEstimator.make(num)
@@ -79,10 +81,9 @@ class BootstrapTestCase(unittest.TestCase):
 
     def test_g_test(self):
         # https://github.com/Qub3k/gsd-acm-mm/blob/master/Data_Analysis/G-test_results/G_test_on_real_data_chunk000_of_872.csv
-        data = jnp.asarray([0,0,1,10,13.])
+        data = jnp.asarray([0, 0, 1, 10, 13.])
         num = GSDParams(512, 128)
         grid = GridEstimator.make(num)
-
 
         hat = grid(data)
         self.assertTrue(np.allclose(hat.psi, 4.5, 0.001))
@@ -90,13 +91,29 @@ class BootstrapTestCase(unittest.TestCase):
 
         p = bootstrap.prob(hat)
         # 0.09459716927725387
-        t = bootstrap.t_statistic(data,p)
-        self.assertAlmostEqual(t,0.09459716927725387,2)
+        t = bootstrap.t_statistic(data, p)
+        self.assertAlmostEqual(t, 0.09459716927725387, 2)
 
         # 0.4957
-        pv = bootstrap.pp_plot_data(data,lambda x: grid(x) ,jax.random.key(44),9999)
+        pv = bootstrap.pp_plot_data(data, lambda x: grid(x),
+                                    jax.random.key(44), 9999)
 
-        self.assertAlmostEqual(pv,0.4957,1)
-
+        self.assertAlmostEqual(pv, 0.4957, 1)
 
         ...
+
+
+class MaxEntropyTestCase(unittest.TestCase):
+    def test_maxentropy(self):
+        me = MaxEntropyGSD(mean=3.2, sigma=0.2, N=5)
+        self.assertAlmostEqual(me.mean, 3.2)
+
+        s = me.sample(jax.random.key(44))
+        s2 = me.sample(jax.random.key(44), shape=(5,))
+        self.assertAlmostEqual(s2.shape[0], 5)
+
+    def test_probs(self):
+        me = MaxEntropyGSD.from_gsd(GSDParams(psi=3.2, rho=0.9), 5)
+        lp = me.all_log_probs
+        p = np.exp(lp)
+        self.assertAlmostEqual(p.sum(), 1)

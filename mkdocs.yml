@@ -1,5 +1,7 @@
 site_name: GSD
 site_description: The documentation for the reference implementation of generalised score distribution in python.
+repo_url: https://github.com/gsd-authors/gsd
+repo_name: gsd-authors/gsd
 
 theme:
     name: "material"
