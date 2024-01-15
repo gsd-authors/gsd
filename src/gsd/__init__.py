@@ -1,4 +1,4 @@
-__version__ = '0.2.1'
+__version__ = '0.2.2dev'
 from gsd.fit import GSDParams as GSDParams
 from gsd.fit import fit_moments as fit_moments
 from gsd.gsd import (log_prob as log_prob,
