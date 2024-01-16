@@ -90,3 +90,10 @@ python3 -m gsd -c 1 2 3 4 5
 ```
 
     psi=3.6667 rho=0.6000
+
+## Acknowledgments
+
+Development of this software has received funding from the Norwegian Financial Mechanism 2014-2021 under project-
+2019/34/H/ST6/00599.
+
+![Norway grants](docs/static/images/Norway_grants.png)
