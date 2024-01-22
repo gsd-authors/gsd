@@ -1,4 +1,5 @@
-from math import comb, prod, ceil, floor
+from math import ceil, comb, floor, prod
+
 
 𝚷 = prod
 
@@ -26,34 +27,50 @@ def vmin(ψ: float) -> float:
 
 
 def vmax(ψ: float) -> float:
-    return (ψ - 1.) * (M - ψ)
+    return (ψ - 1.0) * (M - ψ)
 
 
 def C(ψ):
     Vmax, Vmin = vmax(ψ), vmin(ψ)
     if Vmax != Vmin:
-        return 3. / 4. * Vmax / (Vmax - Vmin)
+        return 3.0 / 4.0 * Vmax / (Vmax - Vmin)
     else:
-        return 1.
+        return 1.0
 
 
 def _prob_k_1(ψ: float, ρ: float) -> float:
-    return (M - ψ) / (M - 1) * 𝚷(
-        ((M - ψ) * ρ / (M - 1) + i * (C(ψ) - ρ)) / (ρ + i * (C(ψ) - ρ)) for i
-        in ℤ[1, M - 2])
+    return (
+        (M - ψ)
+        / (M - 1)
+        * 𝚷(
+            ((M - ψ) * ρ / (M - 1) + i * (C(ψ) - ρ)) / (ρ + i * (C(ψ) - ρ))
+            for i in ℤ[1, M - 2]
+        )
+    )
 
 
 def _prob_k_M(ψ: float, ρ: float) -> float:
-    return (ψ - 1) / (M - 1) * 𝚷(
-        ((ψ - 1) * ρ / (M - 1) + i * (C(ψ) - ρ)) / (ρ + i * (C(ψ) - ρ)) for i
-        in ℤ[1, M - 2])
+    return (
+        (ψ - 1)
+        / (M - 1)
+        * 𝚷(
+            ((ψ - 1) * ρ / (M - 1) + i * (C(ψ) - ρ)) / (ρ + i * (C(ψ) - ρ))
+            for i in ℤ[1, M - 2]
+        )
+    )
 
 
 def _prob_beta_bin_k(ψ, ρ, k):
-    return comb(M - 1, k - 1) * (ψ - 1) * (M - ψ) * ρ / ((M - 1) ** 2) * 𝚷(
-        ((ψ - 1) * ρ / (M - 1) + i * (C(ψ) - ρ)) for i in ℤ[1, k - 2]) * 𝚷(
-        ((M - ψ) * ρ / (M - 1) + j * (C(ψ) - ρ)) for j in ℤ[1, M - k - 1]) / 𝚷(
-        (ρ + i * (C(ψ) - ρ)) for i in ℤ[1, M - 2])
+    return (
+        comb(M - 1, k - 1)
+        * (ψ - 1)
+        * (M - ψ)
+        * ρ
+        / ((M - 1) ** 2)
+        * 𝚷(((ψ - 1) * ρ / (M - 1) + i * (C(ψ) - ρ)) for i in ℤ[1, k - 2])
+        * 𝚷(((M - ψ) * ρ / (M - 1) + j * (C(ψ) - ρ)) for j in ℤ[1, M - k - 1])
+        / 𝚷((ρ + i * (C(ψ) - ρ)) for i in ℤ[1, M - 2])
+    )
 
 
 def _prob_beta_bin(ψ: float, ρ: float, k: int) -> float:
@@ -70,10 +87,9 @@ def _prob_mix(ψ: float, ρ: float, k: int) -> float:
     if ρ == 1:
         ret = min_var_part
     else:
-        ret = (ρ - C(ψ)) / (1 - C(ψ)) * min_var_part + (1 - ρ) / (
-                    1 - C(ψ)) * comb(M - 1, k - 1) * (
-                      (ψ - 1) / (M - 1)) ** (k - 1) * ((M - ψ) / (M - 1)) ** (
-                          M - k)
+        ret = (ρ - C(ψ)) / (1 - C(ψ)) * min_var_part + (1 - ρ) / (1 - C(ψ)) * comb(
+            M - 1, k - 1
+        ) * ((ψ - 1) / (M - 1)) ** (k - 1) * ((M - ψ) / (M - 1)) ** (M - k)
     return ret
 
 

@@ -1,25 +1,22 @@
 from jax import config
 
-from gsd.gsd import make_softvmin, vmax, vmin
 
 config.update("jax_enable_x64", True)
+
 import unittest  # noqa: E402
 
-import numpy as np
-
-import gsd
-from gsd.experimental import fit_mle_grid, bootstrap
-from gsd.experimental.bootstrap import pp_plot_data
-from gsd.experimental.fit import GridEstimator
-from gsd.fit import log_pmax, pairs, pmax, GSDParams, fit_moments
-
 import equinox as eqx
-import optimistix as optx
-
-from gsd.experimental.max_entropy import MaxEntropyGSD, vmax
-
+import gsd
 import jax
 import jax.numpy as jnp
+import numpy as np
+import optimistix as optx
+from gsd.experimental import bootstrap, fit_mle_grid
+from gsd.experimental.bootstrap import pp_plot_data
+from gsd.experimental.fit import GridEstimator
+from gsd.experimental.max_entropy import MaxEntropyGSD, vmax
+from gsd.fit import fit_moments, GSDParams, log_pmax, pairs, pmax
+from gsd.gsd import make_softvmin, vmax, vmin
 
 
 class FitTestCase(unittest.TestCase):
@@ -42,19 +39,17 @@ class FitTestCase(unittest.TestCase):
         self.assertAlmostEqual(theta.psi, 1.0)
 
     def test_fit_grid2(self):
-        data = jnp.asarray([7, 19., 0, 0, 0])
-        theta = fit_mle_grid(data, GSDParams(128, 64),
-                             False)
+        data = jnp.asarray([7, 19.0, 0, 0, 0])
+        theta = fit_mle_grid(data, GSDParams(128, 64), False)
         self.assertAlmostEqual(theta.rho, 1.0)
 
     def test_fit_grid3(self):
         num = GSDParams(16, 8)
         est = GridEstimator.make(num)
-        data = jnp.asarray([7, 25., 0, 0, 0])
+        data = jnp.asarray([7, 25.0, 0, 0, 0])
         hat = est(data)
         theta = fit_mle_grid(data, num, False)
-        jax.tree_util.tree_map(lambda a, b: self.assertAlmostEqual(a, b, 2),
-                               hat, theta)
+        jax.tree_util.tree_map(lambda a, b: self.assertAlmostEqual(a, b, 2), hat, theta)
 
         ...
 
@@ -75,7 +70,7 @@ class PPTestCase(unittest.TestCase):
 class BootstrapTestCase(unittest.TestCase):
     def test_sample_fit(self):
         k = jax.random.key(12)
-        th = GSDParams(psi=4.2, rho=.92)
+        th = GSDParams(psi=4.2, rho=0.92)
         th = jax.tree_util.tree_map(jnp.asarray, th)
         s = gsd.sample(th.psi, th.rho, (100000,), k)
         data = gsd.sufficient_statistic(s)
@@ -88,7 +83,7 @@ class BootstrapTestCase(unittest.TestCase):
 
     def test_g_test(self):
         # https://github.com/Qub3k/gsd-acm-mm/blob/master/Data_Analysis/G-test_results/G_test_on_real_data_chunk000_of_872.csv
-        data = jnp.asarray([0, 0, 1, 10, 13.])
+        data = jnp.asarray([0, 0, 1, 10, 13.0])
         num = GSDParams(512, 128)
         grid = GridEstimator.make(num)
 
@@ -102,8 +97,7 @@ class BootstrapTestCase(unittest.TestCase):
         self.assertAlmostEqual(t, 0.09459716927725387, 2)
 
         # 0.4957
-        pv = bootstrap.pp_plot_data(data, lambda x: grid(x),
-                                    jax.random.key(44), 9999)
+        pv = bootstrap.pp_plot_data(data, lambda x: grid(x), jax.random.key(44), 9999)
 
         self.assertAlmostEqual(pv, 0.4957, 1)
 
@@ -112,7 +106,7 @@ class BootstrapTestCase(unittest.TestCase):
 
 class MaxEntropyTestCase(unittest.TestCase):
     def test_maxentropy(self):
-        me = MaxEntropyGSD(mean=3.2, sigma=0.2, N=5)
+        me = MaxEntropyGSD.from_gsd(GSDParams(psi=3.2, rho=0.9), N=5)
         self.assertAlmostEqual(me.mean, 3.2)
 
         s = me.sample(jax.random.key(44))
@@ -124,7 +118,6 @@ class MaxEntropyTestCase(unittest.TestCase):
         lp = me.all_log_probs
         p = np.exp(lp)
         self.assertAlmostEqual(p.sum(), 1)
-
 
     def test_fit(self):
         def nll(d, x):
@@ -145,10 +138,9 @@ class MaxEntropyTestCase(unittest.TestCase):
         def fit(x):
             solver = optx.BFGS(rtol=1e-2, atol=1e-4)
 
-            res = optx.minimise(nll, solver, (-0.0, .0),
-                                args=x,
-                                max_steps=int(1e6),
-                                throw=True)
+            res = optx.minimise(
+                nll, solver, (-0.0, 0.0), args=x, max_steps=int(1e6), throw=True
+            )
             return res
 
         res = jax.jit(fit)(x)
@@ -161,12 +153,7 @@ class MaxEntropyTestCase(unittest.TestCase):
         sigma = smin + (smax - smin) * jax.nn.sigmoid(s)
         d = MaxEntropyGSD(mean, sigma, N=5)
 
-        self.assertAlmostEqual(d.mean,2., places=4)
+        self.assertAlmostEqual(d.mean, 2.0, places=4)
 
         eqx.tree_pprint(d, short_arrays=False)
-        eqx.tree_pprint(MaxEntropyGSD(jnp.mean(x), jnp.std(x), N=5),
-                        short_arrays=False)
-
-
-
-
+        eqx.tree_pprint(MaxEntropyGSD(jnp.mean(x), jnp.std(x), N=5), short_arrays=False)

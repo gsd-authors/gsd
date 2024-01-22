@@ -8,6 +8,7 @@ from jax import Array
 from jax.typing import ArrayLike
 
 from gsd.experimental.fit import Estimator
+
 from .. import GSDParams
 from ..gsd import log_prob, sample, sufficient_statistic
 
@@ -62,9 +63,9 @@ def prob(x: GSDParams) -> Array:
     :param x: Parametrs of GSD
     :return: An array of probabilities
     """
-    return jnp.exp(jax.vmap(log_prob, in_axes=(None, None, 0))(x.psi, x.rho,
-                                                               jnp.arange(1,
-                                                                          6)))
+    return jnp.exp(
+        jax.vmap(log_prob, in_axes=(None, None, 0))(x.psi, x.rho, jnp.arange(1, 6))
+    )
 
 
 class BootstrapResult(NamedTuple):
@@ -74,27 +75,34 @@ class BootstrapResult(NamedTuple):
 
 
 @partial(jax.jit, static_argnums=(1, 3, 4))
-def static_bootstrap(data: ArrayLike, estimator: Estimator, key: Array,
-                      n_bootstrap_samples: int,
-                      n_total_scores: int) -> BootstrapResult:
+def static_bootstrap(
+    data: ArrayLike,
+    estimator: Estimator,
+    key: Array,
+    n_bootstrap_samples: int,
+    n_total_scores: int,
+) -> BootstrapResult:
     theta_hat = estimator(data)
     exp_prob_gsd = prob(theta_hat)
 
-    bootstrap_samples_gsd = sample(theta_hat.psi, theta_hat.rho,
-                                   (n_bootstrap_samples, n_total_scores), key)
-    bootstrap_samples_gsd = jax.vmap(sufficient_statistic)(
-        bootstrap_samples_gsd)
+    bootstrap_samples_gsd = sample(
+        theta_hat.psi, theta_hat.rho, (n_bootstrap_samples, n_total_scores), key
+    )
+    bootstrap_samples_gsd = jax.vmap(sufficient_statistic)(bootstrap_samples_gsd)
 
     bootstrap_fit = jax.lax.map(estimator, bootstrap_samples_gsd)
 
     bootstrap_exp_prob_gsd = jax.vmap(prob)(bootstrap_fit)
-    return BootstrapResult(probs=exp_prob_gsd,
-                           bootstrap_samples=bootstrap_samples_gsd,
-                           bootstrap_probs=bootstrap_exp_prob_gsd)
+    return BootstrapResult(
+        probs=exp_prob_gsd,
+        bootstrap_samples=bootstrap_samples_gsd,
+        bootstrap_probs=bootstrap_exp_prob_gsd,
+    )
 
 
-def pp_plot_data(data: ArrayLike, estimator: Estimator, key: Array,
-                 n_bootstrap_samples: int) -> Array:
+def pp_plot_data(
+    data: ArrayLike, estimator: Estimator, key: Array, n_bootstrap_samples: int
+) -> Array:
     n = int(np.sum(data))
     b = static_bootstrap(data, estimator, key, n_bootstrap_samples, n)
     p_value = g_test(data, b.probs, b.bootstrap_samples, b.bootstrap_probs)

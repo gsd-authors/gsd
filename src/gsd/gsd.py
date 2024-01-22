@@ -1,4 +1,4 @@
-from typing import Sequence, Callable
+from typing import Callable, Sequence
 
 import jax
 import jax.numpy as jnp
@@ -7,6 +7,7 @@ from jax import Array
 from jax.random import PRNGKeyArray
 from jax.scipy.special import betaln
 from jax.typing import ArrayLike
+
 
 Shape = Sequence[int]
 
@@ -58,21 +59,18 @@ def log_prob(psi: ArrayLike, rho: ArrayLike, k: ArrayLike) -> Array:
     Vmax = vmax(psi)
     C = _C(Vmax, Vmin)
     beta_bin_part = (
-            logbinom(4, k - 1.0)
-            + jnp.sum(
-        jnp.where(
-            index <= k - 2, jnp.log((psi - 1) * rho / 4 + index * (C - rho)),
-            0.0
+        logbinom(4, k - 1.0)
+        + jnp.sum(
+            jnp.where(
+                index <= k - 2, jnp.log((psi - 1) * rho / 4 + index * (C - rho)), 0.0
+            )
         )
-    )
-            + jnp.sum(
-        jnp.where(
-            index <= 4 - k, jnp.log((5.0 - psi) * rho / 4 + index * (C - rho)),
-            0.0
+        + jnp.sum(
+            jnp.where(
+                index <= 4 - k, jnp.log((5.0 - psi) * rho / 4 + index * (C - rho)), 0.0
+            )
         )
-    )
-            - jnp.sum(
-        jnp.where(index <= 3, jnp.log(rho + index * (C - rho)), 0.0))
+        - jnp.sum(jnp.where(index <= 3, jnp.log(rho + index * (C - rho)), 0.0))
     )
 
     b0 = jnp.log(jnp.zeros_like(index))
@@ -82,21 +80,20 @@ def log_prob(psi: ArrayLike, rho: ArrayLike, k: ArrayLike) -> Array:
 
     min_var_part = jax.nn.relu(1.0 - jnp.abs(k - psi))
     log_min_var_part = (
-            jnp.where(rho < C, 0.0, jnp.log(rho - C))
-            - jnp.log1p(-C)
-            + jnp.log(min_var_part)
+        jnp.where(rho < C, 0.0, jnp.log(rho - C))
+        - jnp.log1p(-C)
+        + jnp.log(min_var_part)
     )
     log_bin_part = (
-            jnp.log1p(-rho)
-            - jnp.log1p(-C)
-            + logbinom(4, k - 1.0)
-            + (k - 1) * (jnp.log(psi - 1) - jnp.log(4))
-            + (5 - k) * (jnp.log(5 - psi) - jnp.log(4))
+        jnp.log1p(-rho)
+        - jnp.log1p(-C)
+        + logbinom(4, k - 1.0)
+        + (k - 1) * (jnp.log(psi - 1) - jnp.log(4))
+        + (5 - k) * (jnp.log(5 - psi) - jnp.log(4))
     )
 
     logmix = jnp.logaddexp(
-        jnp.where(min_var_part == 0, almost_neg_inf, log_min_var_part),
-        log_bin_part
+        jnp.where(min_var_part == 0, almost_neg_inf, log_min_var_part), log_bin_part
     )
 
     logmix = jnp.where(rho == 1.0, jnp.log(min_var_part), logmix)
@@ -116,8 +113,7 @@ def variance(psi: ArrayLike, rho: ArrayLike) -> Array:
     return rho * vmin(psi) + (1 - rho) * vmax(psi)
 
 
-def sample(psi: ArrayLike, rho: ArrayLike, shape: Shape,
-           key: PRNGKeyArray) -> Array:
+def sample(psi: ArrayLike, rho: ArrayLike, shape: Shape, key: PRNGKeyArray) -> Array:
     """Sample from GSD
 
     :param psi: mean
@@ -138,7 +134,7 @@ def sufficient_statistic(data: ArrayLike) -> Array:
     :param data: Samples from GSD data[i] in [1..5]
     :return: Counts of each possible value
     """
-    bins = jnp.arange(0.5, N + 1.5, 1.)
+    bins = jnp.arange(0.5, N + 1.5, 1.0)
     c, _ = jnp.histogram(jnp.asarray(data), bins=bins)
     return c
 
@@ -153,7 +149,7 @@ def softvmin_poly(x: Array, c: float, d: float) -> Array:
     sq1 = jnp.square(x - c)
     sq2 = jnp.square(sq1)
 
-    return (3 * d) / 8 - ((-3 + 4 * d) * sq1) / (4 * d) - sq2 / (8 * d ** 3)
+    return (3 * d) / 8 - ((-3 + 4 * d) * sq1) / (4 * d) - sq2 / (8 * d**3)
 
 
 def make_softvmin(d: float) -> Callable[[Array], Array]:
@@ -163,11 +159,10 @@ def make_softvmin(d: float) -> Callable[[Array], Array]:
     :return: A callable returning n approximated value `vmin` for `x`
      `abs(round(x)-x)<=d`
     """
+
     def sofvmin(psi: ArrayLike):
         psi = jnp.asarray(psi)
         c = jax.lax.stop_gradient(jnp.round(psi))
-        return jnp.where(jnp.abs(psi - c) < d, softvmin_poly(psi, c, d),
-                         vmin(psi)
-                         )
+        return jnp.where(jnp.abs(psi - c) < d, softvmin_poly(psi, c, d), vmin(psi))
 
     return sofvmin

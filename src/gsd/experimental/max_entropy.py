@@ -20,29 +20,34 @@ def vmax(mean: Array, N: Int) -> Array:
     return (mean - 1.0) * (N - mean)
 
 
-def _lagrange_log_probs(lagrage: tuple, dist: 'MaxEntropyGSD'):
+def _lagrange_log_probs(lagrage: tuple, dist: "MaxEntropyGSD"):
     lamda1, lamdam, lamdas = lagrage
     lp = lamda1 + dist.support * lamdam + lamdas * dist.squred_diff - 1.0
     return lp
 
 
-def _implicit_log_probs(lagrage: tuple, d: 'MaxEntropyGSD'):
+def _implicit_log_probs(lagrage: tuple, d: "MaxEntropyGSD"):
     lp = _lagrange_log_probs(lagrage, d)
     p = jnp.exp(lp)
-    return (jnp.sum(p) - 1.0,  # jax.nn.logsumexp(lp),
-            jnp.dot(p, d.support) - d.mean,
-            # jax.nn.logsumexp(a=lp, b=d.support) - jnp.log(d.mean),
-            jnp.dot(p, d.squred_diff) - d.sigma ** 2,
-            # jax.nn.logsumexp(a=lp, b=d.squred_diff) - 2 * jnp.log(d.sigma)
-            )
+    return (
+        jnp.sum(p) - 1.0,  # jax.nn.logsumexp(lp),
+        jnp.dot(p, d.support) - d.mean,
+        # jax.nn.logsumexp(a=lp, b=d.support) - jnp.log(d.mean),
+        jnp.dot(p, d.squred_diff) - d.sigma**2,
+        # jax.nn.logsumexp(a=lp, b=d.squred_diff) - 2 * jnp.log(d.sigma)
+    )
 
 
-def _explicit_log_probs(dist: 'MaxEntropyGSD'):
-    solver = optx.Newton(rtol=1e-8, atol=1e-8, )
+def _explicit_log_probs(dist: "MaxEntropyGSD"):
+    solver = optx.Newton(
+        rtol=1e-8,
+        atol=1e-8,
+    )
 
     lgr = jax.tree_util.tree_map(jnp.asarray, (-0.01, -0.01, -0.01))
-    sol = optx.root_find(_implicit_log_probs, solver, lgr, args=dist,
-                         max_steps=int(1e4), throw=True)
+    sol = optx.root_find(
+        _implicit_log_probs, solver, lgr, args=dist, max_steps=int(1e4), throw=True
+    )
     return _lagrange_log_probs(sol.value, dist)
 
 
@@ -62,6 +67,7 @@ class MaxEntropyGSD(eqx.Module):
     :param N: Number of responses
 
     """
+
     mean: Float[Array, ""]
     sigma: Float[Array, ""]  # std
     N: int = eqx.field(static=True)
@@ -105,7 +111,7 @@ class MaxEntropyGSD(eqx.Module):
         return jax.random.categorical(key, lp, axis, shape) + self.support[0]
 
     @staticmethod
-    def from_gsd(theta: GSDParams, N: int) -> 'MaxEntropyGSD':
+    def from_gsd(theta: GSDParams, N: int) -> "MaxEntropyGSD":
         """Created maxentropy from GSD parameters.
 
         :param theta: Parameters of a GSD distribution.
@@ -115,7 +121,7 @@ class MaxEntropyGSD(eqx.Module):
         return MaxEntropyGSD(
             mean=gsd.mean(theta.psi, theta.rho),
             sigma=jnp.sqrt(gsd.variance(theta.psi, theta.rho)),
-            N=N
+            N=N,
         )
 
 

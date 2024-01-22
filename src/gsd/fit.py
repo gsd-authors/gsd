@@ -41,7 +41,7 @@ def pmax(probs: Array) -> Array:
 
 
 def log_pmax(log_probs: Array) -> Array:
-    """ Calculate the maximum of log of the sum of two probabilities from logarithsms of probabilities
+    """Calculate the maximum of log of the sum of two probabilities from logarithsms of probabilities
 
     :param log_probs: logarithsms of probabilities
     :return: Scalar array
@@ -74,10 +74,10 @@ def fit_moments(data: ArrayLike) -> GSDParams:
 
     data = jnp.asarray(data)
     psi = jnp.dot(data, jnp.arange(1, 6)) / jnp.sum(data)
-    V = jnp.dot(data, jnp.arange(1, 6) ** 2) / jnp.sum(data) - psi ** 2
+    V = jnp.dot(data, jnp.arange(1, 6) ** 2) / jnp.sum(data) - psi**2
     vma = vmax(psi)
     vmi = vmin(psi)
-    rho = jnp.where(jnp.allclose(vma,vmi), 0.5, (vmax(psi) - V) / ( vma-vmi) )
+    rho = jnp.where(jnp.allclose(vma, vmi), 0.5, (vmax(psi) - V) / (vma - vmi))
     return GSDParams(psi=psi, rho=rho)
 
 
@@ -86,8 +86,5 @@ def make_logits(theta: GSDParams) -> Array:
     :param theta: GSD parameter
     :return: Array of logits
     """
-    logits = jax.vmap(log_prob, (None, None, 0))(theta.psi, theta.rho,
-                                                    jnp.arange(1, 6))
+    logits = jax.vmap(log_prob, (None, None, 0))(theta.psi, theta.rho, jnp.arange(1, 6))
     return logits
-
-
