@@ -1,11 +1,10 @@
 from jax import config
 
+from gsd.gsd import make_softvmin, vmax, vmin
+
 config.update("jax_enable_x64", True)
-from gsd.experimental.max_entropy import MaxEntropyGSD
 import unittest  # noqa: E402
 
-import jax
-import jax.numpy as jnp
 import numpy as np
 
 import gsd
@@ -13,6 +12,14 @@ from gsd.experimental import fit_mle_grid, bootstrap
 from gsd.experimental.bootstrap import pp_plot_data
 from gsd.experimental.fit import GridEstimator
 from gsd.fit import log_pmax, pairs, pmax, GSDParams, fit_moments
+
+import equinox as eqx
+import optimistix as optx
+
+from gsd.experimental.max_entropy import MaxEntropyGSD, vmax
+
+import jax
+import jax.numpy as jnp
 
 
 class FitTestCase(unittest.TestCase):
@@ -117,3 +124,49 @@ class MaxEntropyTestCase(unittest.TestCase):
         lp = me.all_log_probs
         p = np.exp(lp)
         self.assertAlmostEqual(p.sum(), 1)
+
+
+    def test_fit(self):
+        def nll(d, x):
+            m, s = d
+            mean = 1.0 + 4.0 * jax.nn.sigmoid(m)
+            svmin = make_softvmin(0.1)
+            smin = jnp.sqrt(svmin(mean))
+            smax = jnp.sqrt(vmax(mean, N=5))
+            sigma = smin + (smax - smin) * jax.nn.sigmoid(s)
+            d = MaxEntropyGSD(mean, sigma, N=5)
+            return -jnp.mean(d.log_prob(x))
+
+        # x = jnp.asarray([2, 3, 2, 2, 3, 3, 4])
+        x = jnp.asarray([2, 2, 2, 2, 2, 2, 2])
+
+        eqx.tree_pprint(jax.grad(nll)((0.01, 2.0), x), short_arrays=False)
+
+        def fit(x):
+            solver = optx.BFGS(rtol=1e-2, atol=1e-4)
+
+            res = optx.minimise(nll, solver, (-0.0, .0),
+                                args=x,
+                                max_steps=int(1e6),
+                                throw=True)
+            return res
+
+        res = jax.jit(fit)(x)
+        eqx.tree_pprint(res.value, short_arrays=False)
+
+        m, s = res.value
+        mean = 1.0 + 4.0 * jax.nn.sigmoid(m)
+        smin = jnp.sqrt(vmin(mean))
+        smax = jnp.sqrt(vmax(mean, N=5))
+        sigma = smin + (smax - smin) * jax.nn.sigmoid(s)
+        d = MaxEntropyGSD(mean, sigma, N=5)
+
+        self.assertAlmostEqual(d.mean,2., places=4)
+
+        eqx.tree_pprint(d, short_arrays=False)
+        eqx.tree_pprint(MaxEntropyGSD(jnp.mean(x), jnp.std(x), N=5),
+                        short_arrays=False)
+
+
+
+

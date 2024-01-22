@@ -1,7 +1,7 @@
 import numpy as np
 from jax import config
 
-from gsd.gsd import softvmin_poly, make_sofvmin, vmin
+from gsd.gsd import softvmin_poly, make_softvmin, vmin
 
 config.update("jax_enable_x64", True)
 
@@ -116,7 +116,7 @@ class SoftTestCase(unittest.TestCase):
         self.assertAlmostEqual(v, 0.0529687)
 
     def test_softvmin(self):
-        svmin = make_sofvmin(0.1)
+        svmin = make_softvmin(0.1)
         self.assertAlmostEqual(svmin(3.3), vmin(3.3))
 
         for x in [1.5,1.9, 1.95, 2.05, 2.1, 2.2]:
