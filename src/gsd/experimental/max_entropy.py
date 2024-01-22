@@ -42,7 +42,7 @@ def _explicit_log_probs(dist: 'MaxEntropyGSD'):
 
     lgr = jax.tree_util.tree_map(jnp.asarray, (-0.01, -0.01, -0.01))
     sol = optx.root_find(_implicit_log_probs, solver, lgr, args=dist,
-                         max_steps=int(1e4), throw=False)
+                         max_steps=int(1e4), throw=True)
     return _lagrange_log_probs(sol.value, dist)
 
 
@@ -65,7 +65,6 @@ class MaxEntropyGSD(eqx.Module):
     mean: Float[Array, ""]
     sigma: Float[Array, ""]  # std
     N: int = eqx.field(static=True)
-
 
     def log_prob(self, x: Int[Array, ""]):
         lp = _explicit_log_probs(self)
@@ -106,7 +105,7 @@ class MaxEntropyGSD(eqx.Module):
         return jax.random.categorical(key, lp, axis, shape) + self.support[0]
 
     @staticmethod
-    def from_gsd(theta:GSDParams, N:int) -> 'MaxEntropyGSD':
+    def from_gsd(theta: GSDParams, N: int) -> 'MaxEntropyGSD':
         """Created maxentropy from GSD parameters.
 
         :param theta: Parameters of a GSD distribution.
@@ -119,6 +118,7 @@ class MaxEntropyGSD(eqx.Module):
             N=N
         )
 
+
 MaxEntropyGSD.__init__.__doc__ = """Creates a MaxEntropyGSD
 
         :param mean: Expectation value of the distribution.
@@ -127,6 +127,6 @@ MaxEntropyGSD.__init__.__doc__ = """Creates a MaxEntropyGSD
         
         .. note::
             An alternative way to construct this distribution is by use of 
-            :ref:`from_gsd`
+            :meth:`from_gsd`
   
 """

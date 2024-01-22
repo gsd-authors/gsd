@@ -27,7 +27,7 @@ classifiers = [
 
 # HATCH_PYTHON=python3.10
 requires-python = ">=3.10"
-dependencies=["jax>=0.4.6"]
+dependencies=["jax>=0.4.23"]
 
 [project.urls]
 Homepage = "https://github.com/gsd-authors/gsd"
@@ -46,7 +46,7 @@ include = [
 ]
 
 [tool.hatch.envs.default]
-dependencies=["jaxlib>=0.4.6"]
+dependencies=["jaxlib>=0.4.23"]
 
 [project.optional-dependencies]
 experimental = [

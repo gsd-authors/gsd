@@ -1,4 +1,4 @@
-from typing import Sequence
+from typing import Sequence, Callable
 
 import jax
 import jax.numpy as jnp
@@ -141,3 +141,33 @@ def sufficient_statistic(data: ArrayLike) -> Array:
     bins = jnp.arange(0.5, N + 1.5, 1.)
     c, _ = jnp.histogram(jnp.asarray(data), bins=bins)
     return c
+
+
+def softvmin_poly(x: Array, c: float, d: float) -> Array:
+    """Smooths approximation to `vmin` function.
+
+    :param x: An argument, this would be psi
+    :param d: Cut point of approximation from `[0,0.5)`
+    :return: An approximated value `x` such that `abs(round(x)-x)<=d`
+    """
+    sq1 = jnp.square(x - c)
+    sq2 = jnp.square(sq1)
+
+    return (3 * d) / 8 - ((-3 + 4 * d) * sq1) / (4 * d) - sq2 / (8 * d ** 3)
+
+
+def make_softvmin(d: float) -> Callable[[Array], Array]:
+    """Create a soft approximation to `vmin` function.
+
+    :param d: Cut point of approximation from `[0,0.5)`
+    :return: A callable returning n approximated value `vmin` for `x`
+     `abs(round(x)-x)<=d`
+    """
+    def sofvmin(psi: ArrayLike):
+        psi = jnp.asarray(psi)
+        c = jax.lax.stop_gradient(jnp.round(psi))
+        return jnp.where(jnp.abs(psi - c) < d, softvmin_poly(psi, c, d),
+                         vmin(psi)
+                         )
+
+    return sofvmin
