@@ -1,5 +1,8 @@
 import numpy as np
 from jax import config
+
+from gsd.gsd import softvmin_poly, make_sofvmin, vmin
+
 config.update("jax_enable_x64", True)
 
 import unittest
@@ -103,6 +106,30 @@ class SufficientStatistic(unittest.TestCase):
         ss = gsd.sufficient_statistic(data)
         #                                          1, 2  3  4  5
         self.assertTrue(np.allclose(ss,c))
+
+
+class SoftTestCase(unittest.TestCase):
+    def test_poly(self):
+        v = softvmin_poly(x=1.99,c=2., d=1/50.)
+        self.assertAlmostEqual(v, 0.0109938)
+        v = softvmin_poly(x=2.05,c=2, d=1 / 10.)
+        self.assertAlmostEqual(v, 0.0529687)
+
+    def test_softvmin(self):
+        svmin = make_sofvmin(0.1)
+        self.assertAlmostEqual(svmin(3.3), vmin(3.3))
+
+        for x in [1.5,1.9, 1.95, 2.05, 2.1, 2.2]:
+            gsvmin = jax.grad(svmin)
+            g = gsvmin(x)
+            print(g)
+            self.assertIsNotNone(g)
+
+            ggsvmin = jax.grad(gsvmin)
+            gg = ggsvmin(x)
+            print(gg)
+            self.assertIsNotNone(gg)
+
 
 if __name__ == '__main__':
     unittest.main()
