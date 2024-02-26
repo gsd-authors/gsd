@@ -4,7 +4,6 @@ import jax
 import jax.numpy as jnp
 import numpy as np
 from jax import Array
-from jax.random import PRNGKeyArray
 from jax.scipy.special import betaln
 from jax.typing import ArrayLike
 
@@ -113,7 +112,7 @@ def variance(psi: ArrayLike, rho: ArrayLike) -> Array:
     return rho * vmin(psi) + (1 - rho) * vmax(psi)
 
 
-def sample(psi: ArrayLike, rho: ArrayLike, shape: Shape, key: PRNGKeyArray) -> Array:
+def sample(psi: ArrayLike, rho: ArrayLike, shape: Shape, key: Array) -> Array:
     """Sample from GSD
 
     :param psi: mean
