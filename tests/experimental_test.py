@@ -16,7 +16,7 @@ from gsd.experimental.bootstrap import pp_plot_data
 from gsd.experimental.fit import GridEstimator
 from gsd.experimental.max_entropy import MaxEntropyGSD, vmax
 from gsd.fit import fit_moments, GSDParams, log_pmax, pairs, pmax
-from gsd.gsd import make_softvmin, vmax, vmin
+from gsd.gsd import make_softvmin, vmin
 
 
 class FitTestCase(unittest.TestCase):
